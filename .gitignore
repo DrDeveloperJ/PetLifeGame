@@ -1,4 +1,7 @@
 ## Folder specific ignores
+PetLife.sln
+openal32.dll
+
 sfml-audio-2.dll
 sfml-audio-d-2.dll
 
@@ -17,6 +20,9 @@ sfml-window-d-2.dll
 SFML-2.6.1/
 
 ## Visual Studio Ignores
+
+*.vcxproj
+*.vcxproj.filters
 
 # User-specific files
 *.rsuser
