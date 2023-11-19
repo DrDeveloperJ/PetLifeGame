@@ -1,20 +1,19 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-class Map
+class TitleScreen
 {
 private:
-	sf::Texture MapTexture;
+	sf::Texture TitleTexture;
 
 public:
 	sf::Sprite Sprite;
 
 public:
-	Map();
-	~Map();
+	TitleScreen();
+	~TitleScreen();
 
 	void Load(std::string Dir);
-	void Update();
 	void setPosition(const sf::Vector2f Position);
 };
 

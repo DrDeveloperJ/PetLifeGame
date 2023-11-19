@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Button.h"
+#include "TitleScreen.h"
 
 class Game
 {
@@ -17,6 +18,7 @@ private:
 	Player player;
 	Map map;
 	Button welcome;
+	TitleScreen title;
 	bool welcomeEnabled = true;
 	sf::Font arial;
 	sf::RenderWindow *window;

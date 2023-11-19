@@ -8,13 +8,13 @@ public:
     Button();
     bool isMouseOver(sf::RenderWindow& window);
     void setPosition(sf::Vector2f Position);
-    void setFont(sf::Font &Font);
-    void setBackColor(sf::Color Color);
+    void switchState(int state);
     void DrawTo(sf::RenderWindow& window);
-    void Initialize(std::string Text, sf::Vector2f Size, int charSize, sf::Color bgColor, sf::Color textColor);
-    void Hide();
+    void Load(std::string dir, std::string OnDir, sf::Vector2f Size);
 
 private:
     sf::RectangleShape button;
-    sf::Text text;
+    sf::Texture ButtonTexture;
+    sf::Texture OnButtonTexture;
+    sf::Sprite Sprite;
 };

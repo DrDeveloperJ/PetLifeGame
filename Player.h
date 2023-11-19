@@ -3,16 +3,16 @@
 
 class Player
 {
-private:
-	sf::Texture playerTexture;
 
 public:
+	sf::Texture playerTexture;
 	sf::Sprite Sprite;
 	bool movementAllow;
 
 public:
 	void Initialize();
-	void Load(int xindex, int yindex);
+	void setTexture(int xindex, int yindex);
+	void Load(std::string dir);
 	void Update();
 };
 

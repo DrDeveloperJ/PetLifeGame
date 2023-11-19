@@ -8,13 +8,19 @@ void Player::Initialize()
     Sprite.setPosition({ 525, 255 });
 }
 
-void Player::Load(int xindex, int yindex)
+void Player::setTexture(int xindex, int yindex)
 {
-    if (playerTexture.loadFromFile("Assets/Player/Textures/CatResized/CatSpriteSheet.png"))
+    Sprite.setTexture(playerTexture);
+    Sprite.setTextureRect(sf::IntRect(xindex, yindex, 45, 72));
+}
+
+void Player::Load(std::string dir)
+{
+    if (playerTexture.loadFromFile(dir))
     {
         std::cout << "Loaded Player Texture" << std::endl;
-        Sprite.setTexture(playerTexture);
-        Sprite.setTextureRect(sf::IntRect(xindex, yindex, 45, 72));
+        //Sprite.setTexture(playerTexture);
+        //Sprite.setTextureRect(sf::IntRect(xindex, yindex, 45, 72));
     }
     else
     {

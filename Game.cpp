@@ -1,10 +1,12 @@
 #include "Game.h"
+#include <thread>
+#include "Timer.h"
 
 void Game::initWindow()
 {
     this->window = new sf::RenderWindow(sf::VideoMode(1350, 680), "Pet Game");
     this->window->setPosition({ 0, 0 });
-    arial.loadFromFile("Assets/Fonts/arial/arial.ttf");
+    
 }
 
 Game::Game()
@@ -13,11 +15,23 @@ Game::Game()
 
     player.Initialize();
 
-    welcome.setFont(arial);
-    welcome.Initialize("Welcome", {200, 50}, 20, sf::Color::Green, sf::Color::Black);
-    welcome.setPosition({575, 315});
+    Timer time; //Instantiates a Timer, when the scope of this function ends, the destructor is called and the timer ends
+    
+    auto ArialLoad = [this] {arial.loadFromFile("Assets/Fonts/arial/arial.ttf");};
+    auto MapLoad = [this] {map.Load("Assets/Map/WholeMap.png");};
+    auto TitleLoad = [this] {title.Load("Assets/GameTitle.png");};
+    auto PlayerLoad = [this] {player.Load("Assets/Player/Textures/CatResized/CatSpriteSheet.png");};
+    auto WelcomeLoad = [this] {
+        welcome.Load("Assets/Buttons/WelcomeButton.png", "Assets/Buttons/OnWelcomeButton.png", { 184, 50 });
+        welcome.setPosition({ 575, 315 });
+        };
 
-    map.Load("Assets/Map/WholeMap.png");
+    // Parallel Processing is used here by splitting each asset that is loaded into multiple threads
+    std::jthread ArialLoadThread(ArialLoad);
+    std::jthread MapLoadThread(MapLoad);
+    std::jthread TitleLoadThread(TitleLoad);
+    std::jthread PlayerLoadThread(PlayerLoad);
+    std::jthread WelcomeLoadThread(WelcomeLoad);
 }
 
 Game::~Game()
@@ -35,28 +49,27 @@ void Game::updateSFMLEvents()
             this->window->close();
 
         case sf::Event::MouseMoved:
-            if (welcomeEnabled == true)
+            if (welcomeEnabled)
             {
                 if (welcome.isMouseOver(*window))
                 {
-                    welcome.setBackColor(sf::Color::White);
+                    welcome.switchState(1);
                 }
                 else
                 {
-                    welcome.setBackColor(sf::Color::Green);
+                    welcome.switchState(0);
                 }
             }
             break;
         
         case sf::Event::MouseButtonPressed:
-            if (welcomeEnabled == true)
+            if (welcomeEnabled)
             {
                 if (welcome.isMouseOver(*window))
                 {
                     currentArea = "Outside";
-                    welcome.Hide();
                     welcomeEnabled = false;
-                    player.Load(0, 275);
+                    player.setTexture(0, 275);
                     map.setPosition({-1350, 0});
                 }
             }
@@ -79,8 +92,11 @@ void Game::render()
 
     this->window->draw(map.Sprite);
     this->window->draw(player.Sprite);
-
-    welcome.DrawTo(*window);
+    if (welcomeEnabled)
+    {
+        this->window->draw(title.Sprite);
+        welcome.DrawTo(*window);
+    }
 
     this->window->display();
 }

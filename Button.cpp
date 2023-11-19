@@ -1,18 +1,27 @@
 #include "Button.h"
 
-void Button::Initialize(std::string Text, sf::Vector2f Size, int charSize, sf::Color bgColor, sf::Color textColor)
+void Button::Load(std::string dir, std::string OnDir, sf::Vector2f Size)
 {
-	text.setString(Text);
-	text.setFillColor(textColor);
-	text.setCharacterSize(charSize);
+	if (ButtonTexture.loadFromFile(dir))
+    {
+        std::cout << "Loaded Button Texture" << std::endl;
+        Sprite.setTexture(ButtonTexture);
+    }
+    else
+	{
+        std::cout << "Failed to load Button Texture" << std::endl;
+    }
+
+	if (OnButtonTexture.loadFromFile(OnDir))
+	{
+		std::cout << "Loaded OnButton Texture" << std::endl;
+	}
+	else
+	{
+		std::cout << "Failed to load OnButton Texture" << std::endl;
+	}
 
 	button.setSize(Size);
-	button.setFillColor(bgColor);
-}
-
-void Button::Hide()
-{
-	text.setFillColor(sf::Color::Transparent);
 	button.setFillColor(sf::Color::Transparent);
 }
 
@@ -41,26 +50,25 @@ bool Button::isMouseOver(sf::RenderWindow& window)
 
 void Button::setPosition(sf::Vector2f Position)
 {
-	button.setPosition(Position);
-
-	float xPos = (Position.x + button.getLocalBounds().width / 2) - (text.getLocalBounds().width / 2);
-	float yPos = (Position.y + button.getLocalBounds().height / 2.5) - (text.getLocalBounds().height / 2);
-
-	text.setPosition({xPos, yPos});
+	button.setPosition({Position.x+8, Position.y});
+	Sprite.setPosition(Position);
 }
 
-void Button::setFont(sf::Font& Font)
+void Button::switchState(int state)
 {
-	text.setFont(Font);
-}
-
-void Button::setBackColor(sf::Color Color)
-{
-	button.setFillColor(Color);
+	switch (state)
+	{
+	case 0:
+		Sprite.setTexture(ButtonTexture);
+		break;
+	case 1:
+		Sprite.setTexture(OnButtonTexture);
+		break;
+	}
 }
 
 void Button::DrawTo(sf::RenderWindow& window)
 {
 	window.draw(button);
-	window.draw(text);
+	window.draw(Sprite);
 }
