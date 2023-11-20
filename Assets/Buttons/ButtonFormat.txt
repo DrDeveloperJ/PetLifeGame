@@ -1,0 +1,3 @@
+Each of these buttons are made in Photoshop :
+- Text = DejaVu Sans
+- Size = 24 px

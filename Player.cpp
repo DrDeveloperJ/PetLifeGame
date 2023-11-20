@@ -3,15 +3,15 @@
 
 void Player::Initialize()
 {
-    Sprite.scale(sf::Vector2f(6, 6));
-    movementAllow = true;
-    Sprite.setPosition({ 525, 255 });
+    Sprite.scale(sf::Vector2f(0.75, 0.75)); // Scales the player
+    movementAllow = true; // Allows the player to move
+    Sprite.setPosition({ 475, 290 }); // Sets the player's position
 }
 
 void Player::setTexture(int xindex, int yindex)
 {
-    Sprite.setTexture(playerTexture);
-    Sprite.setTextureRect(sf::IntRect(xindex, yindex, 45, 72));
+    Sprite.setTexture(playerTexture); // Sets the texture for the player
+    Sprite.setTextureRect(sf::IntRect(xindex, yindex, 542, 474)); // Sets the texture rectangle for the player
 }
 
 void Player::Load(std::string dir)
@@ -30,6 +30,7 @@ void Player::Load(std::string dir)
 
 void Player::Update()
 {
+    // Allows the player to move
     if (movementAllow == true)
     {
         sf::Vector2f position = Sprite.getPosition();
@@ -54,4 +55,24 @@ void Player::Update()
             Sprite.setPosition(position + sf::Vector2f(0, -1));
         }
     }
+}
+
+void Player::AnimationUpdate(int row, float deltaTime, float timeBetweenSwitch)
+{
+    interval += deltaTime;
+    if (interval >= timeBetweenSwitch) // If the interval is greater than or equal to the defined time between switch, reset the interval and run the next texture in the animation
+    {
+        interval = 0.0f; // Resets the interval
+
+        if (currentAnimationStage == 4878)
+        {
+            currentAnimationStage = 0;
+            setTexture(currentAnimationStage, row);
+        }
+        else
+        {
+            currentAnimationStage += 542;
+            setTexture(currentAnimationStage, row);
+        }
+	}
 }

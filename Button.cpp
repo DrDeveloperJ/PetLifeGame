@@ -29,7 +29,22 @@ Button::Button()
 {
 }
 
-bool Button::isMouseOver(sf::RenderWindow& window)
+void Button::switchState(int state)
+{
+	switch (state)
+	{
+	case 0:
+		Sprite.setTexture(ButtonTexture);
+		ButtonState = 0;
+		break;
+	case 1:
+		Sprite.setTexture(OnButtonTexture);
+		ButtonState = 1;
+		break;
+	}
+}
+
+void Button::MouseOver(sf::RenderWindow& window)
 {
 	float mouseX = sf::Mouse::getPosition(window).x;
 	float mouseY = sf::Mouse::getPosition(window).y;
@@ -42,29 +57,18 @@ bool Button::isMouseOver(sf::RenderWindow& window)
 
 	if (mouseX < btnXPosWidth && mouseX > btnX && mouseY < btnXPosHeight && mouseY > btnY)
 	{
-		return true;
+		switchState(1);
 	}
-
-	return false;
+	else
+	{
+		switchState(0);
+	}
 }
 
 void Button::setPosition(sf::Vector2f Position)
 {
 	button.setPosition({Position.x+8, Position.y});
 	Sprite.setPosition(Position);
-}
-
-void Button::switchState(int state)
-{
-	switch (state)
-	{
-	case 0:
-		Sprite.setTexture(ButtonTexture);
-		break;
-	case 1:
-		Sprite.setTexture(OnButtonTexture);
-		break;
-	}
 }
 
 void Button::DrawTo(sf::RenderWindow& window)

@@ -6,11 +6,12 @@ class Button
 {
 public:
     Button();
-    bool isMouseOver(sf::RenderWindow& window);
+    void MouseOver(sf::RenderWindow& window);
     void setPosition(sf::Vector2f Position);
     void switchState(int state);
     void DrawTo(sf::RenderWindow& window);
     void Load(std::string dir, std::string OnDir, sf::Vector2f Size);
+    int ButtonState = 0;
 
 private:
     sf::RectangleShape button;

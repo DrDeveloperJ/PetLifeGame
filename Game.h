@@ -20,10 +20,17 @@ private:
 	Button welcome;
 	TitleScreen title;
 	bool welcomeEnabled = true;
+
 	sf::Font arial;
 	sf::RenderWindow *window;
 	sf::Event sfEvent;
 	std::string currentArea;
+
+	sf::Clock clock;
+	float deltatime = 0.0f;
+
+	Button goInside;
+	Button playAround;
 
 	void initWindow();
 
