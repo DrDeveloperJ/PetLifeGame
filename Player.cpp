@@ -19,8 +19,6 @@ void Player::Load(std::string dir)
     if (playerTexture.loadFromFile(dir))
     {
         std::cout << "Loaded Player Texture" << std::endl;
-        //Sprite.setTexture(playerTexture);
-        //Sprite.setTextureRect(sf::IntRect(xindex, yindex, 45, 72));
     }
     else
     {
@@ -63,16 +61,31 @@ void Player::AnimationUpdate(int row, float deltaTime, float timeBetweenSwitch)
     if (interval >= timeBetweenSwitch) // If the interval is greater than or equal to the defined time between switch, reset the interval and run the next texture in the animation
     {
         interval = 0.0f; // Resets the interval
-
-        if (currentAnimationStage == 4878)
+        if (row == 948 || row == 1896 || row == 2370)
         {
-            currentAnimationStage = 0;
-            setTexture(currentAnimationStage, row);
+            if (currentAnimationStage == 3794)
+            {
+                currentAnimationStage = 0;
+                setTexture(currentAnimationStage, row);
+            }
+            else
+            {
+                currentAnimationStage += 542;
+                setTexture(currentAnimationStage, row);
+            }
         }
         else
         {
-            currentAnimationStage += 542;
-            setTexture(currentAnimationStage, row);
+            if (currentAnimationStage == 4878)
+            {
+                currentAnimationStage = 0;
+                setTexture(currentAnimationStage, row);
+            }
+            else
+            {
+                currentAnimationStage += 542;
+                setTexture(currentAnimationStage, row);
+            }
         }
-	}
+    }
 }
