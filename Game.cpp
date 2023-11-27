@@ -27,7 +27,7 @@ Game::Game()
         }
 
         };
-    auto MapLoad = [this] {map.Load("Assets/Map/WholeMap.png"); };
+    auto MapLoad = [this] {map.Load("Assets/Map/WholeMapNew.png"); };
     auto TitleLoad = [this] {title.Load("Assets/GameTitle.png"); };
     auto PlayerLoad = [this] {player.Load("Assets/Player/Textures/CatResized/Cat_SpriteSheet.png"); };
     auto CurrencyBarLoad = [this] {
@@ -67,6 +67,31 @@ Game::Game()
         goInside.Load("Assets/Buttons/GoInside.png", "Assets/Buttons/OnGoInside.png", { 184, 50 });
         goInside.setPosition({ 875, 585 });
         };
+    auto EntryWayLoad = [this] {
+        EntryWay.Load("Assets/Buttons/Interior/EntryWay.png", "Assets/Buttons/Interior/OnEntryWay.png", { 184, 50 });
+        EntryWay.setPosition({ 10, 250 });
+        };
+    auto KitchenLoad = [this] {
+        Kitchen.Load("Assets/Buttons/Interior/Kitchen.png", "Assets/Buttons/Interior/OnKitchen.png", { 184, 50 });
+        Kitchen.setPosition({ 10, 300 });
+        };
+    auto BedroomLoad = [this] {
+        Bedroom.Load("Assets/Buttons/Interior/Bedroom.png", "Assets/Buttons/Interior/OnBedroom.png", { 184, 50 });
+        Bedroom.setPosition({ 10, 350 });
+        };
+    auto BathroomLoad = [this] {
+        Bathroom.Load("Assets/Buttons/Interior/Bathroom.png", "Assets/Buttons/Interior/OnBathroom.png", { 184, 50 });
+        Bathroom.setPosition({ 10, 400 });
+        };
+    auto GoOutsideLoad = [this] {
+        GoOutside.Load("Assets/Buttons/Interior/GoOutside.png", "Assets/Buttons/Interior/OnGoOutside.png", { 184, 50 });
+        GoOutside.setPosition({ 10, 450 });
+        };
+    auto UncleanDebuffLoad = [this] {
+        Unclean.Load("Assets/Debuffs/UncleanDebuff.png", { 1, 1 });
+        Unclean.setPosition({ 1263, 290 });
+        Unclean.Initialize(10.0f);
+        };
 
     // Parallel Processing is used here by splitting each asset that is loaded into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
@@ -81,6 +106,13 @@ Game::Game()
     std::jthread WelcomeLoadThread(WelcomeLoad);
     std::jthread PlayAroundLoadThread(PlayAroundLoad);
     std::jthread GoInsideLoadThread(GoInsideLoad);
+    std::jthread EntryWayLoadThread(EntryWayLoad);
+    std::jthread KitchenLoadThread(KitchenLoad);
+    std::jthread BedroomLoadThread(BedroomLoad);
+    std::jthread BathroomLoadThread(BathroomLoad);
+    std::jthread GoOutsideLoadThread(GoOutsideLoad);
+    std::jthread UncleanDebuffLoadThread(UncleanDebuffLoad);
+    
 }
 
 // Destructor
@@ -112,6 +144,17 @@ void Game::updateSFMLEvents()
                 playAround.MouseOver(*window);
 
             }
+            if ((currentArea == "EntryWay") || (currentArea == "Kitchen") || (currentArea == "Bedroom") || (currentArea == "Bathroom"))
+			{
+				EntryWay.MouseOver(*window);
+				Kitchen.MouseOver(*window);
+				Bedroom.MouseOver(*window);
+				Bathroom.MouseOver(*window);
+			}
+            if (currentArea == "EntryWay")
+            {
+                GoOutside.MouseOver(*window);
+            }
             break;
 
             // If the mouse button is pressed, check if it is over the welcome button
@@ -127,6 +170,92 @@ void Game::updateSFMLEvents()
                     map.setPosition({ -1350, 0 }); // Sets the map's initial position
                 }
             }
+            if (currentArea == "Outside")
+            {
+                if (goInside.ButtonState == 1)
+                {
+                    std::cout << "Go Inside" << std::endl;
+                    currentArea = "EntryWay";
+                    map.setPosition({ -2700, 0 });
+                    goInside.switchState(0);
+                }
+            }
+
+            /*
+            switch (currentArea)
+            {
+				case "EntryWay":
+				if (Kitchen.ButtonState == 1)
+				{
+					std::cout << "Kitchen" << std::endl;
+					currentArea = "Kitchen";
+					map.setPosition({ -4050, 0 });
+					Kitchen.switchState(0);
+				}
+				if (Bedroom.ButtonState == 1)
+				{
+					std::cout << "Bedroom" << std::endl;
+					currentArea = "Bedroom";
+					map.setPosition({ -5400, 0 });
+					Bedroom.switchState(0);
+				}
+				if (Bathroom.ButtonState == 1)
+				{
+					std::cout << "Bathroom" << std::endl;
+					currentArea = "Bathroom";
+					map.setPosition({ -6750, 0 });
+					Bathroom.switchState(0);
+				}
+				if (GoOutside.ButtonState == 1)
+				{
+					std::cout << "Go Outside" << std::endl;
+					currentArea = "Outside";
+					map.setPosition({ -1350, 0 });
+                    GoOutside.switchState(0);
+				}
+            }
+            */
+            if ((currentArea == "EntryWay") || (currentArea == "Kitchen") || (currentArea == "Bedroom") || (currentArea == "Bathroom"))
+            {
+                if (EntryWay.ButtonState == 1)
+				{
+					std::cout << "EntryWay" << std::endl;
+					currentArea = "EntryWay";
+					map.setPosition({ -2700, 0 });
+					EntryWay.switchState(0);
+				}
+                if (Kitchen.ButtonState == 1)
+                {
+                    std::cout << "Kitchen" << std::endl;
+                    currentArea = "Kitchen";
+                    map.setPosition({ -4050, 0 });
+                    Kitchen.switchState(0);
+                }
+                if (Bedroom.ButtonState == 1)
+                {
+                    std::cout << "Bedroom" << std::endl;
+                    currentArea = "Bedroom";
+                    map.setPosition({ -5400, 0 });
+                    Bedroom.switchState(0);
+                }
+                if (Bathroom.ButtonState == 1)
+                {
+                    std::cout << "Bathroom" << std::endl;
+                    currentArea = "Bathroom";
+                    map.setPosition({ -6750, 0 });
+                    Bathroom.switchState(0);
+                }
+            }
+            if (currentArea == "EntryWay")
+			{
+				if (GoOutside.ButtonState == 1)
+				{
+					std::cout << "Go Outside" << std::endl;
+					currentArea = "Outside";
+					map.setPosition({ -1350, 0 });
+					GoOutside.switchState(0);
+				}
+			}
         }
     }
 }
@@ -142,15 +271,48 @@ void Game::update()
     
     deltatime = clock.restart().asSeconds();
     player.AnimationUpdate(0, deltatime, 0.15f); // Sets the player's animation
-    gameTime = gameClock.getElapsedTime().asSeconds();
-    hungerBar.DecrementValue(1, gameTime, timeBetweenSwitch);
-    energyBar.DecrementValue(1, gameTime, timeBetweenSwitch);
-    boredomBar.DecrementValue(1, gameTime, timeBetweenSwitch);
-    if (gameTime >= timeBetweenSwitch)
+
+    hungerGameTime = hungerGameClock.getElapsedTime().asSeconds();
+    energyGameTime = energyGameClock.getElapsedTime().asSeconds();
+    boredomGameTime = boredomGameClock.getElapsedTime().asSeconds();
+    uncleanGameTime = uncleanGameClock.getElapsedTime().asSeconds();
+    healthGameTime = healthGameClock.getElapsedTime().asSeconds();
+    hungerBar.DecrementValue(1, hungerGameTime, hungerTimeBetweenSwitch);
+    energyBar.DecrementValue(1, energyGameTime, energyTimeBetweenSwitch);
+    boredomBar.DecrementValue(1, boredomGameTime, boredomTimeBetweenSwitch);
+
+    if (hungerGameTime >= hungerTimeBetweenSwitch)
     {
-        gameTime = gameClock.restart().asSeconds();
+        hungerGameTime = hungerGameClock.restart().asSeconds();
     }
-    
+    if (energyGameTime >= energyTimeBetweenSwitch)
+	{
+		energyGameTime = energyGameClock.restart().asSeconds();
+	}
+    if (boredomGameTime >= boredomTimeBetweenSwitch)
+    {
+        boredomGameTime = boredomGameClock.restart().asSeconds();
+    }
+    if ((uncleanGameTime >= uncleanTimeBetweenSwitch) && (Unclean.getActive() == false))
+	{
+        Unclean.setActive(true);
+        energyTimeBetweenSwitch -= Unclean.change;
+        boredomTimeBetweenSwitch -= Unclean.change;
+        hungerTimeBetweenSwitch -= Unclean.change;
+        std::cout << energyTimeBetweenSwitch << std::endl;
+        std::cout << boredomTimeBetweenSwitch << std::endl;
+        std::cout << hungerTimeBetweenSwitch << std::endl;
+		uncleanGameTime = uncleanGameClock.restart().asSeconds();
+	}
+
+    if (hungerBar.getValue() == 0 && energyBar.getValue() == 0 && boredomBar.getValue() == 0)
+	{
+        healthBar.DecrementHealthValue(1, healthGameTime, healthTimeBetweenSwitch);
+        if (healthGameTime >= healthTimeBetweenSwitch)
+        {
+            healthGameTime = healthGameClock.restart().asSeconds();
+        }
+	}
 }
 
 // Renders the game
@@ -172,15 +334,76 @@ void Game::render()
         this->window->draw(title.Sprite);
         welcome.DrawTo(*window);
     }
-    if (currentArea == "Outside")
+    else
     {
-        goInside.DrawTo(*window);
-        playAround.DrawTo(*window);
-        currencyBar.DrawTo(*window);
-        healthBar.DrawSpriteOnlyTo(*window);
-        hungerBar.DrawSpriteOnlyTo(*window);
-        energyBar.DrawSpriteOnlyTo(*window);
-        boredomBar.DrawSpriteOnlyTo(*window);
+        if (Unclean.getActive())
+        {
+            Unclean.DrawTo(*window);
+        }
+
+        if (currentArea == "Outside")
+        {
+            goInside.DrawTo(*window);
+            playAround.DrawTo(*window);
+            currencyBar.DrawTo(*window);
+            healthBar.DrawSpriteOnlyTo(*window);
+            hungerBar.DrawSpriteOnlyTo(*window);
+            energyBar.DrawSpriteOnlyTo(*window);
+            boredomBar.DrawSpriteOnlyTo(*window);
+        }
+        if (currentArea == "EntryWay")
+        {
+            EntryWay.DrawTo(*window);
+            Kitchen.DrawTo(*window);
+            Bedroom.DrawTo(*window);
+            Bathroom.DrawTo(*window);
+            GoOutside.DrawTo(*window);
+
+            currencyBar.DrawTo(*window);
+            healthBar.DrawSpriteOnlyTo(*window);
+            hungerBar.DrawSpriteOnlyTo(*window);
+            energyBar.DrawSpriteOnlyTo(*window);
+            boredomBar.DrawSpriteOnlyTo(*window);
+        }
+        if (currentArea == "Kitchen")
+        {
+            EntryWay.DrawTo(*window);
+            Kitchen.DrawTo(*window);
+            Bedroom.DrawTo(*window);
+            Bathroom.DrawTo(*window);
+
+            currencyBar.DrawTo(*window);
+            healthBar.DrawSpriteOnlyTo(*window);
+            hungerBar.DrawSpriteOnlyTo(*window);
+            energyBar.DrawSpriteOnlyTo(*window);
+            boredomBar.DrawSpriteOnlyTo(*window);
+        }
+        if (currentArea == "Bedroom")
+        {
+            EntryWay.DrawTo(*window);
+            Kitchen.DrawTo(*window);
+            Bedroom.DrawTo(*window);
+            Bathroom.DrawTo(*window);
+
+            currencyBar.DrawTo(*window);
+            healthBar.DrawSpriteOnlyTo(*window);
+            hungerBar.DrawSpriteOnlyTo(*window);
+            energyBar.DrawSpriteOnlyTo(*window);
+            boredomBar.DrawSpriteOnlyTo(*window);
+        }
+        if (currentArea == "Bathroom")
+        {
+            EntryWay.DrawTo(*window);
+            Kitchen.DrawTo(*window);
+            Bedroom.DrawTo(*window);
+            Bathroom.DrawTo(*window);
+
+            currencyBar.DrawTo(*window);
+            healthBar.DrawSpriteOnlyTo(*window);
+            hungerBar.DrawSpriteOnlyTo(*window);
+            energyBar.DrawSpriteOnlyTo(*window);
+            boredomBar.DrawSpriteOnlyTo(*window);
+        }
     }
 
     this->window->display();

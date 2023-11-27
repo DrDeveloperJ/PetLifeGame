@@ -11,6 +11,7 @@
 #include "Button.h"
 #include "TitleScreen.h"
 #include "Bar.h"
+#include "Debuff.h"
 
 class Game
 {
@@ -28,10 +29,21 @@ private:
 	std::string currentArea;
 
 	sf::Clock clock;
-	sf::Clock gameClock;
-	float timeBetweenSwitch = 5.0f;
+	sf::Clock hungerGameClock;
+	sf::Clock energyGameClock;
+	sf::Clock boredomGameClock;
+	sf::Clock healthGameClock;
+	float hungerTimeBetweenSwitch = 5.0f;
+	float energyTimeBetweenSwitch = 5.0f;
+	float boredomTimeBetweenSwitch = 5.0f;
+	float uncleanTimeBetweenSwitch = 60.0f;
+	float healthTimeBetweenSwitch = 2.0f;
 	float deltatime = 0.0f;
-	float gameTime = 0.0f;
+	float hungerGameTime = 0.0f;
+	float energyGameTime = 0.0f;
+	float boredomGameTime = 0.0f;
+	float uncleanGameTime = 0.0f;
+	float healthGameTime = 0.0f;
 
 	Bar currencyBar;
 	Bar healthBar;
@@ -41,6 +53,15 @@ private:
 
 	Button goInside;
 	Button playAround;
+
+	Button EntryWay;
+	Button Kitchen;
+    Button Bedroom;
+	Button Bathroom;
+	Button GoOutside;
+
+	sf::Clock uncleanGameClock;
+	Debuff Unclean;
 
 	void initWindow();
 

@@ -63,6 +63,11 @@ void Bar::updateValue(int newvalue)
     displayedValue.setString(std::to_string(value));
 }
 
+int Bar::getValue()
+{
+	return value;
+}
+
 void Bar::setPosition(const sf::Vector2f Position, const sf::Vector2f PositionText)
 {
     Sprite.setPosition(Position);
@@ -102,22 +107,19 @@ void Bar::DecrementValue(int amount, float &gameTime, float timeBetweenSwitch)
     }
 }
 
-void Bar::IncrementValue(int amount, float& gameTime, float timeBetweenSwitch)
+void Bar::DecrementHealthValue(int amount, float& gameTime, float timeBetweenSwitch)
 {
-    if (gameTime >= timeBetweenSwitch)
-    {
-        value += amount;
-        std::cout << "New Value = " << value << std::endl;
+	if ((gameTime >= timeBetweenSwitch) && (empty == false))
+	{
+		value -= amount;
+		std::cout << "New Health Value = " << value << std::endl;
 
-        if (currentX == 1200)
-        {
-            currentX = 0;
-        }
-        else
-        {
-            currentX += 200;
-        }
+		if (value == 0)
+		{
+			empty = true;
+		}
 
-        setTexture(currentX, 0, 200, 100);
-    }
+        currentX += 17;
+		setTexture(currentX, 0, 17, 17);
+	}
 }
