@@ -1,16 +1,17 @@
 #include "Button.h"
 
-void Button::Load(std::string dir, std::string OnDir, sf::Vector2f Size)
+void Button::Load(std::string dir, std::string OnDir, sf::Vector2f Size, int NoPressindexX, int NoPressindexY, int NoPressSizeX, int NoPressSizeY)
 {
 	if (ButtonTexture.loadFromFile(dir))
-    {
-        std::cout << "Loaded Button Texture" << std::endl;
-        Sprite.setTexture(ButtonTexture);
-    }
-    else
 	{
-        std::cout << "Failed to load Button Texture" << std::endl;
-    }
+		std::cout << "Loaded Button Texture" << std::endl;
+		Sprite.setTexture(ButtonTexture);
+		Sprite.setTextureRect(sf::Rect(NoPressindexX, NoPressindexY, NoPressSizeX, NoPressSizeY));
+	}
+	else
+	{
+		std::cout << "Failed to load Button Texture" << std::endl;
+	}
 
 	if (OnButtonTexture.loadFromFile(OnDir))
 	{
@@ -44,30 +45,38 @@ void Button::switchState(int state)
 	}
 }
 
+void Button::setTexture(int indexX, int indexY, int sizeX, int sizeY)
+{
+	Sprite.setTextureRect(sf::Rect(indexX, indexY, sizeX, sizeY));
+}
+
 void Button::MouseOver(sf::RenderWindow& window)
 {
-	float mouseX = sf::Mouse::getPosition(window).x;
-	float mouseY = sf::Mouse::getPosition(window).y;
-
-	float btnX = button.getPosition().x;
-	float btnY = button.getPosition().y;
-
-	float btnXPosWidth = button.getPosition().x + button.getLocalBounds().width;
-	float btnXPosHeight = button.getPosition().y + button.getLocalBounds().height;
-
-	if (mouseX < btnXPosWidth && mouseX > btnX && mouseY < btnXPosHeight && mouseY > btnY)
+	if (active)
 	{
-		switchState(1);
-	}
-	else
-	{
-		switchState(0);
+		float mouseX = sf::Mouse::getPosition(window).x;
+		float mouseY = sf::Mouse::getPosition(window).y;
+
+		float btnX = button.getPosition().x;
+		float btnY = button.getPosition().y;
+
+		float btnXPosWidth = button.getPosition().x + button.getLocalBounds().width;
+		float btnXPosHeight = button.getPosition().y + button.getLocalBounds().height;
+
+		if (mouseX < btnXPosWidth && mouseX > btnX && mouseY < btnXPosHeight && mouseY > btnY)
+		{
+			switchState(1);
+		}
+		else
+		{
+			switchState(0);
+		}
 	}
 }
 
 void Button::setPosition(sf::Vector2f Position)
 {
-	button.setPosition({Position.x+8, Position.y});
+	button.setPosition({ Position.x + 8, Position.y });
 	Sprite.setPosition(Position);
 }
 

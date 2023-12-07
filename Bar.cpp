@@ -39,7 +39,7 @@ void Bar::Load(std::string dir, int indexX, int indexY, int sizeX, int sizeY)
 
 void Bar::setTexture(int indexX, int indexY, int sizeX, int sizeY)
 {
-	Sprite.setTextureRect(sf::Rect(indexX, indexY, sizeX, sizeY));
+    Sprite.setTextureRect(sf::Rect(indexX, indexY, sizeX, sizeY));
 }
 
 void Bar::Initialize(int givenValue, const sf::Vector2f Scale, sf::Font& font)
@@ -51,10 +51,19 @@ void Bar::Initialize(int givenValue, const sf::Vector2f Scale, sf::Font& font)
     Sprite.setScale(Scale);
 }
 
-void Bar::Initialize(int givenValue, const sf::Vector2f Scale)
+void Bar::Initialize(bool empty, bool full, int givenValue, const sf::Vector2f Scale)
 {
     value = givenValue;
     Sprite.setScale(Scale);
+
+    if (full == true)
+    {
+        currentX = 0;
+    }
+    else
+    {
+        currentX = 1200;
+    }
 }
 
 void Bar::updateValue(int newvalue)
@@ -65,7 +74,19 @@ void Bar::updateValue(int newvalue)
 
 int Bar::getValue()
 {
-	return value;
+    return value;
+}
+
+void Bar::resetValue()
+{
+    value = 0;
+    full = false;
+    empty = true;
+}
+
+void Bar::setCurrentX(int currentXNew)
+{
+    currentX = currentXNew;
 }
 
 void Bar::setPosition(const sf::Vector2f Position, const sf::Vector2f PositionText)
@@ -90,15 +111,15 @@ void Bar::DrawSpriteOnlyTo(sf::RenderWindow& window)
     window.draw(Sprite);
 }
 
-void Bar::DecrementValue(int amount, float &gameTime, float timeBetweenSwitch)
+void Bar::DecrementValue(int amount, float& gameTime, float timeBetweenSwitch)
 {
     if ((gameTime >= timeBetweenSwitch) && (empty == false))
     {
         value -= amount;
         if (value == 0)
         {
-			empty = true;
-		}
+            empty = true;
+        }
         std::cout << "New Value = " << value << std::endl;
 
         currentX += 200;
@@ -107,19 +128,42 @@ void Bar::DecrementValue(int amount, float &gameTime, float timeBetweenSwitch)
     }
 }
 
+void Bar::IncrementValue(int amount, float& gameTime, float timeBetweenSwitch)
+{
+    if ((gameTime >= timeBetweenSwitch) && (full == false))
+    {
+        value += amount;
+
+        if (value == 0)
+        {
+            empty = true;
+        }
+        if (value == 6)
+        {
+            full = true;
+        }
+
+        std::cout << "New Value = " << value << std::endl;
+
+        currentX -= 200;
+
+        setTexture(currentX, 0, 200, 100);
+    }
+}
+
 void Bar::DecrementHealthValue(int amount, float& gameTime, float timeBetweenSwitch)
 {
-	if ((gameTime >= timeBetweenSwitch) && (empty == false))
-	{
-		value -= amount;
-		std::cout << "New Health Value = " << value << std::endl;
+    if ((gameTime >= timeBetweenSwitch) && (empty == false))
+    {
+        value -= amount;
+        std::cout << "New Health Value = " << value << std::endl;
 
-		if (value == 0)
-		{
-			empty = true;
-		}
+        if (value == 0)
+        {
+            empty = true;
+        }
 
         currentX += 17;
-		setTexture(currentX, 0, 17, 17);
-	}
+        setTexture(currentX, 0, 17, 17);
+    }
 }
