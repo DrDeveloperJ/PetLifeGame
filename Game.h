@@ -14,6 +14,7 @@
 #include "Debuff.h"
 #include "BathMinigame.h"
 #include "Currency.h"
+#include "SleepingFunctionality.h"
 
 class Game
 {
@@ -37,6 +38,7 @@ private:
 	sf::Clock healthGameClock;
 	sf::Clock spongeBathClock;
 	sf::Clock bathClock;
+	sf::Clock energyIncrementClock;
 
 	float hungerTimeBetweenSwitch = 15.0f;
 	float energyTimeBetweenSwitch = 15.0f;
@@ -45,6 +47,7 @@ private:
 	float healthTimeBetweenSwitch = 2.0f;
 	float spongeBathTimeBetweenSwitch = 4.0f;
 	float bathTimeBetweenSwitch = 0.5f;
+	float energyTimeBetweenIncrement = 1.0f;
 
 
 	float deltatime = 0.0f;
@@ -55,6 +58,7 @@ private:
 	float healthGameTime = 0.0f;
 	float spongeMoveAroundTime = 0.0f;
 	float bathTime = 0.0f;
+	float energyIncrementTime = 0.0f;
 
 	Bar currencyBar;
 	Bar healthBar;
@@ -74,10 +78,14 @@ private:
 	Currency currency;
 
 	Button bathButton;
-
 	sf::Clock uncleanGameClock;
 	Debuff Unclean;
 	BathMinigame bathMinigame;
+
+	Button sleepButton;
+	Button wakeButton;
+	SleepingFunctionality sleepFunctionality;
+	float sleepingZIncrement = 0.0f;
 
 	void initWindow();
 

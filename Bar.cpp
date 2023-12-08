@@ -116,10 +116,24 @@ void Bar::DecrementValue(int amount, float& gameTime, float timeBetweenSwitch)
     if ((gameTime >= timeBetweenSwitch) && (empty == false))
     {
         value -= amount;
+
         if (value == 0)
         {
             empty = true;
         }
+		else
+		{
+			empty = false;
+		}
+        if (value == 6)
+        {
+            full = true;
+        }
+        else
+        {
+            full = false;
+        }
+
         std::cout << "New Value = " << value << std::endl;
 
         currentX += 200;
@@ -138,10 +152,18 @@ void Bar::IncrementValue(int amount, float& gameTime, float timeBetweenSwitch)
         {
             empty = true;
         }
+        else
+        {
+            empty = false;
+        }
         if (value == 6)
         {
             full = true;
         }
+		else
+		{
+			full = false;
+		}
 
         std::cout << "New Value = " << value << std::endl;
 

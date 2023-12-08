@@ -5,6 +5,7 @@ class Player // Class for the player
 {
 private:
 	int currentAnimationStage;
+	int previousRow;
 	float interval;
 
 public:
@@ -15,6 +16,7 @@ public:
 
 	void Initialize(); // Initialize the player
 	void setTexture(int xindex, int yindex); // Set the texture for the player
+	void setTexture(int xindex, int yindex, int width, int height); // Set the texture for the player
 	void Load(std::string dir); // Load the texture for the player
 	void Update(); // Update the player
 	void AnimationUpdate(int row, float deltaTime, float timeBetweenSwitch); // Set the current animation for the player

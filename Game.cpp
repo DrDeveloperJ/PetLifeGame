@@ -106,6 +106,17 @@ Game::Game()
 		currency.Load("Assets/Bars/Currency/coin.png");
 		currency.initialize({ 638, 250 });
 		};
+    auto sleepFunctionalityLoad = [this] {
+        sleepFunctionality.Load("Assets/Map/Interior/BedroomLightOffOverlay.png", "Assets/Bars/Energy/SleepingZ.png", { 0, 0});
+        };
+    auto sleepButtonLoad = [this] {
+		sleepButton.Load("Assets/Buttons/SleepButtons/SleepButton.png", "Assets/Buttons/SleepButtons/OnSleepButton.png", { 102, 102 }, 0, 0, 102, 102);
+		sleepButton.setPosition({ 613, 550 });
+		};
+    auto wakeButtonLoad = [this] {
+        wakeButton.Load("Assets/Buttons/SleepButtons/OnSleepButton.png", "Assets/Buttons/SleepButtons/SleepButton.png", { 102, 102 }, 0, 0, 102, 102);
+        wakeButton.setPosition({ 613, 550 });
+        };
 
     // Parallel Processing is used here by splitting each asset that is loaded into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
@@ -129,6 +140,9 @@ Game::Game()
     std::jthread BathMinigameLoadThread(BathMinigameLoad);
     std::jthread BathButtonLoadThread(bathButtonLoad);
     std::jthread currencyLoadThread(currencyLoad);
+    std::jthread sleepFunctionalityLoadThread(sleepFunctionalityLoad);
+    std::jthread sleepButtonLoadThread(sleepButtonLoad);
+    std::jthread wakeButtonLoadThread(wakeButtonLoad);
 }
 
 // Destructor
@@ -183,6 +197,17 @@ void Game::updateSFMLEvents()
                     bathButton.MouseOver(*window);
                 }
             }
+            if (currentArea == "Bedroom")
+			{
+                if (sleepFunctionality.getActive())
+                {
+					wakeButton.MouseOver(*window);
+				}
+				else
+				{
+					sleepButton.MouseOver(*window);
+                }
+			}
             break;
 
             // If the mouse button is pressed, check if it is over the welcome button
@@ -261,6 +286,37 @@ void Game::updateSFMLEvents()
                     GoOutside.switchState(0);
                 }
             }
+            if (currentArea == "Bedroom")
+            {
+                if (sleepFunctionality.getActive())
+                {
+					if (wakeButton.ButtonState == 1)
+					{
+						sleepFunctionality.setActive(false);
+                        wakeButton.active = false;
+                        sleepButton.active = true;
+                        EntryWay.active = true;
+                        Kitchen.active = true;
+                        Bedroom.active = true;
+                        Bathroom.active = true;
+						wakeButton.switchState(0);
+					}
+                }
+                else
+                {
+                    if (sleepButton.ButtonState == 1)
+                    {
+                        sleepFunctionality.setActive(true);
+                        sleepButton.active = false;
+                        wakeButton.active = true;
+                        EntryWay.active = false;
+                        Kitchen.active = false;
+                        Bedroom.active = false;
+                        Bathroom.active = false;
+                        sleepButton.switchState(0);
+                    }
+                }
+            }
         }
     }
 }
@@ -277,7 +333,37 @@ void Game::update()
     if (!welcomeEnabled)
     {
         deltatime = clock.restart().asSeconds();
-        player.AnimationUpdate(0, deltatime, 0.15f); // Sets the player's animation
+        if ((currentArea == "Bedroom") && (sleepFunctionality.getActive()))
+        {
+            player.AnimationUpdate(3318, deltatime, 0.15f); // Sets the player's animation
+        }
+        else
+        {
+            player.AnimationUpdate(0, deltatime, 0.15f); // Sets the player's animation
+        }
+
+        sleepingZIncrement += deltatime;
+
+        if (sleepingZIncrement >= 0.4f)
+        {
+            sleepingZIncrement = 0;
+
+            switch (sleepFunctionality.currentZ)
+            {
+			case 0:
+                sleepFunctionality.setZ({ 600, 450 }, { 0.5, 0.5 }, -45);
+                sleepFunctionality.currentZ = 1;
+				break;
+            case 1:
+				sleepFunctionality.setZ({ 575, 400 }, { 0.5, 0.5 }, -45);
+                sleepFunctionality.currentZ = 2;
+                break;
+            case 2:
+                sleepFunctionality.setZ({ 550, 350 }, { 0.5, 0.5 }, -45);
+				sleepFunctionality.currentZ = 0;
+				break;
+            }
+        }
 
         if (currency.getActive())
         {
@@ -291,14 +377,37 @@ void Game::update()
         healthGameTime = healthGameClock.getElapsedTime().asSeconds();
         spongeMoveAroundTime = spongeBathClock.getElapsedTime().asSeconds();
 
+        if (!sleepFunctionality.getActive())
+		{
+            if (energyBar.getValue() <= 2)
+            {
+                sleepFunctionality.setRewardAllowed(true);
+            }
+            energyBar.DecrementValue(1, energyGameTime, energyTimeBetweenSwitch);
+		}
+        else
+        {
+            energyIncrementTime = energyIncrementClock.getElapsedTime().asSeconds();
+            energyBar.IncrementValue(1, energyIncrementTime, energyTimeBetweenIncrement);
+            if ((energyBar.getValue() == 6) && (sleepFunctionality.getRewardAllowed()))
+			{
+				sleepFunctionality.setRewardAllowed(false);
+                currency.setActive(true);
+                int newCurrencyValue = currencyBar.getValue() + 1;
+                currencyBar.updateValue(newCurrencyValue);
+			}
+        }
         hungerBar.DecrementValue(1, hungerGameTime, hungerTimeBetweenSwitch);
-        energyBar.DecrementValue(1, energyGameTime, energyTimeBetweenSwitch);
         boredomBar.DecrementValue(1, boredomGameTime, boredomTimeBetweenSwitch);
 
         if (hungerGameTime >= hungerTimeBetweenSwitch)
         {
             hungerGameTime = hungerGameClock.restart().asSeconds();
         }
+        if (energyIncrementTime >= energyTimeBetweenIncrement)
+		{
+			energyIncrementTime = energyIncrementClock.restart().asSeconds();
+		}
         if (energyGameTime >= energyTimeBetweenSwitch)
         {
             energyGameTime = energyGameClock.restart().asSeconds();
@@ -387,12 +496,6 @@ void Game::render()
     }
     else
     {
-
-        if (Unclean.getActive())
-        {
-            Unclean.DrawTo(*window);
-        }
-
         if (currency.getActive())
         {
 			currency.draw(*window);
@@ -437,10 +540,19 @@ void Game::render()
         }
         if (currentArea == "Bedroom")
         {
-            EntryWay.DrawTo(*window);
-            Kitchen.DrawTo(*window);
-            Bedroom.DrawTo(*window);
-            Bathroom.DrawTo(*window);
+            if (!sleepFunctionality.getActive())
+            {
+                EntryWay.DrawTo(*window);
+                Kitchen.DrawTo(*window);
+                Bedroom.DrawTo(*window);
+                Bathroom.DrawTo(*window);
+                sleepButton.DrawTo(*window);
+            }
+            else
+            {
+                sleepFunctionality.Draw(*window);
+                wakeButton.DrawTo(*window);
+            }
 
             currencyBar.DrawTo(*window);
             healthBar.DrawSpriteOnlyTo(*window);
@@ -479,6 +591,11 @@ void Game::render()
                 Bathroom.active = false;
                 bathMinigame.DrawTo(*window);
             }
+        }
+
+        if (Unclean.getActive())
+        {
+            Unclean.DrawTo(*window);
         }
     }
 
