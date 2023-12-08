@@ -13,6 +13,7 @@
 #include "Bar.h"
 #include "Debuff.h"
 #include "BathMinigame.h"
+#include "Currency.h"
 
 class Game
 {
@@ -69,6 +70,8 @@ private:
 	Button Bedroom;
 	Button Bathroom;
 	Button GoOutside;
+
+	Currency currency;
 
 	Button bathButton;
 

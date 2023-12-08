@@ -155,7 +155,7 @@ bool BathMinigame::isOverSponge()
 	return overSponge;
 }
 
-void BathMinigame::miniGameFinishedCheck(Debuff& Unclean, sf::Clock& uncleanGameClock, float& hungerTimeBetweenSwitch, float& energyTimeBetweenSwitch, float& boredomTimeBetweenSwitch)
+void BathMinigame::miniGameFinishedCheck(Debuff& Unclean, sf::Clock& uncleanGameClock, float& hungerTimeBetweenSwitch, float& energyTimeBetweenSwitch, float& boredomTimeBetweenSwitch, Currency &currency, Bar &currencyBar)
 {
 	if (bathBar.getValue() == 6)
 	{
@@ -166,5 +166,8 @@ void BathMinigame::miniGameFinishedCheck(Debuff& Unclean, sf::Clock& uncleanGame
 		energyTimeBetweenSwitch += 10.0f;
 		boredomTimeBetweenSwitch += 10.0f;
 		overSponge = false;
+		currency.setActive(true);
+		int newCurrencyValue = currencyBar.getValue() + 1;
+		currencyBar.updateValue(newCurrencyValue);
 	}
 }

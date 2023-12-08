@@ -102,6 +102,10 @@ Game::Game()
         bathButton.Load("Assets/Buttons/BathButtons/BathButton.png", "Assets/Buttons/BathButtons/OnBathButton.png", { 102, 102 }, 0, 0, 102, 102);
         bathButton.setPosition({ 613, 550 });
         };
+    auto currencyLoad = [this] {
+		currency.Load("Assets/Bars/Currency/coin.png");
+		currency.initialize({ 638, 250 });
+		};
 
     // Parallel Processing is used here by splitting each asset that is loaded into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
@@ -124,6 +128,7 @@ Game::Game()
     std::jthread UncleanDebuffLoadThread(UncleanDebuffLoad);
     std::jthread BathMinigameLoadThread(BathMinigameLoad);
     std::jthread BathButtonLoadThread(bathButtonLoad);
+    std::jthread currencyLoadThread(currencyLoad);
 }
 
 // Destructor
@@ -269,11 +274,16 @@ void Game::update()
     player.Update();
     map.Update();
 
-    deltatime = clock.restart().asSeconds();
-    player.AnimationUpdate(0, deltatime, 0.15f); // Sets the player's animation
-
     if (!welcomeEnabled)
     {
+        deltatime = clock.restart().asSeconds();
+        player.AnimationUpdate(0, deltatime, 0.15f); // Sets the player's animation
+
+        if (currency.getActive())
+        {
+            currency.AnimationUpdate(deltatime, 0.075f);
+        }
+
         hungerGameTime = hungerGameClock.getElapsedTime().asSeconds();
         energyGameTime = energyGameClock.getElapsedTime().asSeconds();
         boredomGameTime = boredomGameClock.getElapsedTime().asSeconds();
@@ -339,7 +349,7 @@ void Game::update()
                 bathTime = bathClock.restart().asSeconds();
             }
 
-            bathMinigame.miniGameFinishedCheck(Unclean, uncleanGameClock, hungerTimeBetweenSwitch, energyTimeBetweenSwitch, boredomTimeBetweenSwitch);
+            bathMinigame.miniGameFinishedCheck(Unclean, uncleanGameClock, hungerTimeBetweenSwitch, energyTimeBetweenSwitch, boredomTimeBetweenSwitch, currency, currencyBar);
         }
 
         if ((!Unclean.getActive()) && (bathButton.active))
@@ -382,6 +392,11 @@ void Game::render()
         {
             Unclean.DrawTo(*window);
         }
+
+        if (currency.getActive())
+        {
+			currency.draw(*window);
+		}
 
         if (currentArea == "Outside")
         {

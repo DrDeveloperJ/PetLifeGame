@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Bar.h"
 #include "Debuff.h"
+#include "Currency.h"
 
 class BathMinigame
 {
@@ -32,7 +33,7 @@ public:
 	bool isActive();
 	void setActive(bool newactive);
 	bool isOverSponge();
-	void miniGameFinishedCheck(Debuff& Unclean, sf::Clock& uncleanGameClock, float& hungerTimeBetweenSwitch, float& energyTimeBetweenSwitch, float& boredomTimeBetweenSwitch);
+	void miniGameFinishedCheck(Debuff& Unclean, sf::Clock& uncleanGameClock, float& hungerTimeBetweenSwitch, float& energyTimeBetweenSwitch, float& boredomTimeBetweenSwitch, Currency& currency, Bar &currencyBar);
 	void DrawTo(sf::RenderWindow& window);
 };
 
