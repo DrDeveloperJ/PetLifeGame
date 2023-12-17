@@ -61,9 +61,9 @@ void Button::MouseOver(sf::RenderWindow& window)
 		float btnY = button.getPosition().y;
 
 		float btnXPosWidth = button.getPosition().x + button.getLocalBounds().width;
-		float btnXPosHeight = button.getPosition().y + button.getLocalBounds().height;
+		float btnYPosHeight = button.getPosition().y + button.getLocalBounds().height;
 
-		if (mouseX < btnXPosWidth && mouseX > btnX && mouseY < btnXPosHeight && mouseY > btnY)
+		if (mouseX < btnXPosWidth && mouseX > btnX && mouseY < btnYPosHeight && mouseY > btnY)
 		{
 			switchState(1);
 		}

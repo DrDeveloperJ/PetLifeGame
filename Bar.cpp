@@ -173,6 +173,37 @@ void Bar::IncrementValue(int amount, float& gameTime, float timeBetweenSwitch)
     }
 }
 
+void Bar::IncrementValue(int amount)
+{
+    if (full == false)
+    {
+        value += amount;
+
+        if (value == 0)
+        {
+            empty = true;
+        }
+        else
+        {
+            empty = false;
+        }
+        if (value == 6)
+        {
+            full = true;
+        }
+        else
+        {
+            full = false;
+        }
+
+        std::cout << "New Value = " << value << std::endl;
+
+        currentX -= 200;
+
+        setTexture(currentX, 0, 200, 100);
+    }
+}
+
 void Bar::DecrementHealthValue(int amount, float& gameTime, float timeBetweenSwitch)
 {
     if ((gameTime >= timeBetweenSwitch) && (empty == false))

@@ -103,20 +103,33 @@ Game::Game()
         bathButton.setPosition({ 613, 550 });
         };
     auto currencyLoad = [this] {
-		currency.Load("Assets/Bars/Currency/coin.png");
-		currency.initialize({ 638, 250 });
-		};
+        currency.Load("Assets/Bars/Currency/coin.png");
+        currency.initialize({ 638, 250 });
+        };
     auto sleepFunctionalityLoad = [this] {
-        sleepFunctionality.Load("Assets/Map/Interior/BedroomLightOffOverlay.png", "Assets/Bars/Energy/SleepingZ.png", { 0, 0});
+        sleepFunctionality.Load("Assets/Map/Interior/BedroomLightOffOverlay.png", "Assets/Bars/Energy/SleepingZ.png", { 0, 0 });
         };
     auto sleepButtonLoad = [this] {
-		sleepButton.Load("Assets/Buttons/SleepButtons/SleepButton.png", "Assets/Buttons/SleepButtons/OnSleepButton.png", { 102, 102 }, 0, 0, 102, 102);
-		sleepButton.setPosition({ 613, 550 });
-		};
+        sleepButton.Load("Assets/Buttons/SleepButtons/SleepButton.png", "Assets/Buttons/SleepButtons/OnSleepButton.png", { 102, 102 }, 0, 0, 102, 102);
+        sleepButton.setPosition({ 613, 550 });
+        };
     auto wakeButtonLoad = [this] {
         wakeButton.Load("Assets/Buttons/SleepButtons/OnSleepButton.png", "Assets/Buttons/SleepButtons/SleepButton.png", { 102, 102 }, 0, 0, 102, 102);
         wakeButton.setPosition({ 613, 550 });
         };
+    auto eatingMinigameLoad = [this] {
+        eatingMinigame.Load("Assets/Minigames/EatingMiniGame/EatingBG.png", "Assets/Minigames/EatingMiniGame/Food.png", "Assets/Minigames/EatingMiniGame/CorrectFood.png", "Assets/Minigames/EatingMiniGame/IncorrectFood.png");
+        eatingMinigame.Initialize({ 100, 90 });
+        };
+    auto eatButtonLoad = [this] {
+        eatButton.Load("Assets/Buttons/KitchenButtons/EatButton.png", "Assets/Buttons/KitchenButtons/OnEatButton.png", { 102, 102 }, 0, 0, 102, 102);
+        eatButton.setPosition({ 613, 550 });
+        };
+    auto kitchenTableOverlayLoad = [this] {
+		kitchenTableOverlayTexture.loadFromFile("Assets/Map/Interior/TableOverlayKitchen.png");
+		kitchenTableOverlay.setTexture(kitchenTableOverlayTexture);
+		kitchenTableOverlay.setPosition({ 0, 0 });
+		};
 
     // Parallel Processing is used here by splitting each asset that is loaded into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
@@ -143,6 +156,9 @@ Game::Game()
     std::jthread sleepFunctionalityLoadThread(sleepFunctionalityLoad);
     std::jthread sleepButtonLoadThread(sleepButtonLoad);
     std::jthread wakeButtonLoadThread(wakeButtonLoad);
+    std::jthread eatingMinigameLoadThread(eatingMinigameLoad);
+    std::jthread kitchenTableOverlayLoadThread(kitchenTableOverlayLoad);
+    std::jthread eatButtonLoadThread(eatButtonLoad);
 }
 
 // Destructor
@@ -198,16 +214,34 @@ void Game::updateSFMLEvents()
                 }
             }
             if (currentArea == "Bedroom")
-			{
+            {
                 if (sleepFunctionality.getActive())
                 {
-					wakeButton.MouseOver(*window);
-				}
-				else
-				{
-					sleepButton.MouseOver(*window);
+                    wakeButton.MouseOver(*window);
                 }
-			}
+                else
+                {
+                    sleepButton.MouseOver(*window);
+                }
+            }
+            if (currentArea == "Kitchen")
+            {
+                if (!eatingMinigame.isActive())
+                {
+
+                    if (hungerBar.getValue() == 6)
+                    {
+                        eatButton.setTexture(102, 0, 102, 102);
+                        eatButton.active = false;
+					}
+                    else
+                    {
+                        eatButton.setTexture(0, 0, 102, 102);
+                        eatButton.MouseOver(*window);
+                        eatButton.active = true;
+					}
+                }
+            }
             break;
 
             // If the mouse button is pressed, check if it is over the welcome button
@@ -290,17 +324,17 @@ void Game::updateSFMLEvents()
             {
                 if (sleepFunctionality.getActive())
                 {
-					if (wakeButton.ButtonState == 1)
-					{
-						sleepFunctionality.setActive(false);
+                    if (wakeButton.ButtonState == 1)
+                    {
+                        sleepFunctionality.setActive(false);
                         wakeButton.active = false;
                         sleepButton.active = true;
                         EntryWay.active = true;
                         Kitchen.active = true;
                         Bedroom.active = true;
                         Bathroom.active = true;
-						wakeButton.switchState(0);
-					}
+                        wakeButton.switchState(0);
+                    }
                 }
                 else
                 {
@@ -315,6 +349,35 @@ void Game::updateSFMLEvents()
                         Bathroom.active = false;
                         sleepButton.switchState(0);
                     }
+                }
+            }
+            if (currentArea == "Kitchen")
+            {
+                if (eatButton.ButtonState == 1)
+                {
+                    std::cout << "EatMinigameOpen" << std::endl;
+					eatingMinigame.SetActive(true, hungerBar);
+					eatButton.switchState(0);
+				}
+
+                if (eatingMinigame.isActive())
+                {
+                    bool isOverFood1{ eatingMinigame.IsOverFood(*window, 1) };
+                    eatingMinigame.FoodSwitchState(1, isOverFood1, hungerBar);
+                    bool isOverFood2{ eatingMinigame.IsOverFood(*window, 2) };
+                    eatingMinigame.FoodSwitchState(2, isOverFood2, hungerBar);
+                    bool isOverFood3{ eatingMinigame.IsOverFood(*window, 3) };
+                    eatingMinigame.FoodSwitchState(3, isOverFood3, hungerBar);
+                    bool isOverFood4{ eatingMinigame.IsOverFood(*window, 4) };
+                    eatingMinigame.FoodSwitchState(4, isOverFood4, hungerBar);
+                    bool isOverFood5{ eatingMinigame.IsOverFood(*window, 5) };
+                    eatingMinigame.FoodSwitchState(5, isOverFood5, hungerBar);
+                    bool isOverFood6{ eatingMinigame.IsOverFood(*window, 6) };
+                    eatingMinigame.FoodSwitchState(6, isOverFood6, hungerBar);
+                    bool isOverFood7{ eatingMinigame.IsOverFood(*window, 7) };
+                    eatingMinigame.FoodSwitchState(7, isOverFood7, hungerBar);
+                    bool isOverFood8{ eatingMinigame.IsOverFood(*window, 8) };
+                    eatingMinigame.FoodSwitchState(8, isOverFood8, hungerBar);
                 }
             }
         }
@@ -350,18 +413,18 @@ void Game::update()
 
             switch (sleepFunctionality.currentZ)
             {
-			case 0:
+            case 0:
                 sleepFunctionality.setZ({ 600, 450 }, { 0.5, 0.5 }, -45);
                 sleepFunctionality.currentZ = 1;
-				break;
+                break;
             case 1:
-				sleepFunctionality.setZ({ 575, 400 }, { 0.5, 0.5 }, -45);
+                sleepFunctionality.setZ({ 575, 400 }, { 0.5, 0.5 }, -45);
                 sleepFunctionality.currentZ = 2;
                 break;
             case 2:
                 sleepFunctionality.setZ({ 550, 350 }, { 0.5, 0.5 }, -45);
-				sleepFunctionality.currentZ = 0;
-				break;
+                sleepFunctionality.currentZ = 0;
+                break;
             }
         }
 
@@ -376,26 +439,27 @@ void Game::update()
         uncleanGameTime = uncleanGameClock.getElapsedTime().asSeconds();
         healthGameTime = healthGameClock.getElapsedTime().asSeconds();
         spongeMoveAroundTime = spongeBathClock.getElapsedTime().asSeconds();
+        foodMoveAroundTime = foodGameClock.getElapsedTime().asSeconds();
 
         if (!sleepFunctionality.getActive())
-		{
+        {
             if (energyBar.getValue() <= 2)
             {
                 sleepFunctionality.setRewardAllowed(true);
             }
             energyBar.DecrementValue(1, energyGameTime, energyTimeBetweenSwitch);
-		}
+        }
         else
         {
             energyIncrementTime = energyIncrementClock.getElapsedTime().asSeconds();
             energyBar.IncrementValue(1, energyIncrementTime, energyTimeBetweenIncrement);
             if ((energyBar.getValue() == 6) && (sleepFunctionality.getRewardAllowed()))
-			{
-				sleepFunctionality.setRewardAllowed(false);
+            {
+                sleepFunctionality.setRewardAllowed(false);
                 currency.setActive(true);
                 int newCurrencyValue = currencyBar.getValue() + 1;
                 currencyBar.updateValue(newCurrencyValue);
-			}
+            }
         }
         hungerBar.DecrementValue(1, hungerGameTime, hungerTimeBetweenSwitch);
         boredomBar.DecrementValue(1, boredomGameTime, boredomTimeBetweenSwitch);
@@ -405,9 +469,9 @@ void Game::update()
             hungerGameTime = hungerGameClock.restart().asSeconds();
         }
         if (energyIncrementTime >= energyTimeBetweenIncrement)
-		{
-			energyIncrementTime = energyIncrementClock.restart().asSeconds();
-		}
+        {
+            energyIncrementTime = energyIncrementClock.restart().asSeconds();
+        }
         if (energyGameTime >= energyTimeBetweenSwitch)
         {
             energyGameTime = energyGameClock.restart().asSeconds();
@@ -473,6 +537,14 @@ void Game::update()
             bathButton.setTexture(0, 0, 102, 102);
         }
     }
+
+    if (currentArea == "Kitchen")
+    {
+        if (eatingMinigame.isActive())
+        {
+            eatingMinigame.MiniGameFinishedCheck(hungerBar, currency, currencyBar);
+        }
+    }
 }
 
 // Renders the game
@@ -498,8 +570,8 @@ void Game::render()
     {
         if (currency.getActive())
         {
-			currency.draw(*window);
-		}
+            currency.draw(*window);
+        }
 
         if (currentArea == "Outside")
         {
@@ -527,10 +599,29 @@ void Game::render()
         }
         if (currentArea == "Kitchen")
         {
-            EntryWay.DrawTo(*window);
-            Kitchen.DrawTo(*window);
-            Bedroom.DrawTo(*window);
-            Bathroom.DrawTo(*window);
+            if (!eatingMinigame.isActive())
+            {
+                window->draw(kitchenTableOverlay);
+
+                EntryWay.active = true;
+                Kitchen.active = true;
+                Bedroom.active = true;
+                Bathroom.active = true;
+
+                EntryWay.DrawTo(*window);
+                Kitchen.DrawTo(*window);
+                Bedroom.DrawTo(*window);
+                Bathroom.DrawTo(*window);
+                eatButton.DrawTo(*window);
+            }
+            else
+            {
+                EntryWay.active = false;
+                Kitchen.active = false;
+                Bedroom.active = false;
+                Bathroom.active = false;
+                eatingMinigame.Draw(*window);
+            }
 
             currencyBar.DrawTo(*window);
             healthBar.DrawSpriteOnlyTo(*window);

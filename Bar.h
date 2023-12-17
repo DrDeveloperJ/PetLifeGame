@@ -31,5 +31,6 @@ public:
 	void DrawSpriteOnlyTo(sf::RenderWindow& window);
 	void DecrementValue(int amount, float& gameTime, float timeBetweenSwitch);
 	void IncrementValue(int amount, float& gameTime, float timeBetweenSwitch);
+	void IncrementValue(int amount);
 	void DecrementHealthValue(int amount, float& gameTime, float timeBetweenSwitch);
 };

@@ -15,6 +15,7 @@
 #include "BathMinigame.h"
 #include "Currency.h"
 #include "SleepingFunctionality.h"
+#include "EatingMinigame.h"
 
 class Game
 {
@@ -39,6 +40,7 @@ private:
 	sf::Clock spongeBathClock;
 	sf::Clock bathClock;
 	sf::Clock energyIncrementClock;
+	sf::Clock foodGameClock;
 
 	float hungerTimeBetweenSwitch = 15.0f;
 	float energyTimeBetweenSwitch = 15.0f;
@@ -48,6 +50,7 @@ private:
 	float spongeBathTimeBetweenSwitch = 4.0f;
 	float bathTimeBetweenSwitch = 0.5f;
 	float energyTimeBetweenIncrement = 1.0f;
+	float foodTimeBetweenSwitch = 4.0f;
 
 
 	float deltatime = 0.0f;
@@ -59,6 +62,7 @@ private:
 	float spongeMoveAroundTime = 0.0f;
 	float bathTime = 0.0f;
 	float energyIncrementTime = 0.0f;
+	float foodMoveAroundTime = 0.0f;
 
 	Bar currencyBar;
 	Bar healthBar;
@@ -87,11 +91,16 @@ private:
 	SleepingFunctionality sleepFunctionality;
 	float sleepingZIncrement = 0.0f;
 
+	Button eatButton;
+	EatingMinigame eatingMinigame;
+	sf::Texture kitchenTableOverlayTexture;
+	sf::Sprite kitchenTableOverlay;
+
 	void initWindow();
 
 public:
 	Game();
-	virtual ~Game();
+	~Game();
 	void updateSFMLEvents();
 	void update();
 	void render();
