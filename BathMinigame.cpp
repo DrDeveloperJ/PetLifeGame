@@ -11,6 +11,7 @@ BathMinigame::~BathMinigame()
 
 void BathMinigame::Load(std::string backgrounddir, std::string spongedir, std::string SpongeOnDir, std::string bathBardir)
 {
+	// Load textures for the minigame
 	backgroundTexture.loadFromFile(backgrounddir);
 	background.setTexture(backgroundTexture);
 
@@ -22,9 +23,9 @@ void BathMinigame::Load(std::string backgrounddir, std::string spongedir, std::s
 	bathBar.Load(bathBardir, 1200, 0, 200, 100);
 }
 
-void BathMinigame::SpongeMouseOver(sf::RenderWindow& window) // run the clock and bar updating just like for the other bars in 
-//the same section, but only if the mouse is over the sponge (so add an if statement)
+void BathMinigame::SpongeMouseOver(sf::RenderWindow& window)
 {
+	// Sets overSponge based on if the mouse is over the sponge or not
 	float mouseX = sf::Mouse::getPosition(window).x;
 	float mouseY = sf::Mouse::getPosition(window).y;
 
@@ -46,11 +47,13 @@ void BathMinigame::SpongeMouseOver(sf::RenderWindow& window) // run the clock an
 
 bool BathMinigame::isActive()
 {
+	// Returns if the minigame is active or not
 	return active;
 }
 
 void BathMinigame::Initialize(sf::Vector2f BackgroundPosition, sf::Vector2f SpongePosition, sf::Vector2f barPosition)
 {
+	// Initializes the minigame
 	background.setPosition(BackgroundPosition);
 
 	sponge.setPosition(SpongePosition);
@@ -61,11 +64,13 @@ void BathMinigame::Initialize(sf::Vector2f BackgroundPosition, sf::Vector2f Spon
 
 void BathMinigame::SpongeSetPosition(sf::Vector2f position)
 {
+	// Sets the position of the sponge
 	sponge.setPosition(position);
 }
 
 void BathMinigame::SpongeSwitchState(bool overSponge)
 {
+	// Switches the state of the sponge (Scrubbing or not scrubbing)
 	if (overSponge)
 	{
 		sponge.setTexture(spongeOnTexture);
@@ -78,6 +83,7 @@ void BathMinigame::SpongeSwitchState(bool overSponge)
 
 void BathMinigame::SpongeMoveAround(sf::Clock& spongeBathClock, float& spongeMoveAroundTime, float spongeBathTimeBetweenSwitch)
 {
+	// Moves the sponge around the bath in random directions
 	if (spongeMoveAroundTime >= spongeBathTimeBetweenSwitch)
 	{
 		spongeMoveAroundTime = spongeBathClock.restart().asSeconds();
@@ -85,6 +91,7 @@ void BathMinigame::SpongeMoveAround(sf::Clock& spongeBathClock, float& spongeMov
 		std::srand(time(0));
 		direction = rand() % 10;
 
+		// Ensures the sponge doesnt go in a non existant direction
 		if (direction > 7)
 		{
 			direction -= 2;
@@ -119,6 +126,7 @@ void BathMinigame::SpongeMoveAround(sf::Clock& spongeBathClock, float& spongeMov
 		break;
 	}
 
+	// Ensures the sponge doesnt go off the screen
 	if (sponge.getPosition().y <= background.getPosition().y)
 	{
 		sponge.setPosition(sf::Vector2f(650, 350));
@@ -140,6 +148,7 @@ void BathMinigame::SpongeMoveAround(sf::Clock& spongeBathClock, float& spongeMov
 
 void BathMinigame::DrawTo(sf::RenderWindow& window)
 {
+	// Draws the minigame to the window
 	window.draw(background);
 	window.draw(sponge);
 	bathBar.DrawSpriteOnlyTo(window);
@@ -147,24 +156,34 @@ void BathMinigame::DrawTo(sf::RenderWindow& window)
 
 void BathMinigame::setActive(bool newactive)
 {
+	// Sets the minigame to active or inactive
 	active = newactive;
 }
 
 bool BathMinigame::isOverSponge()
 {
+	// Returns if the mouse is over the sponge or not
 	return overSponge;
 }
 
 void BathMinigame::miniGameFinishedCheck(Debuff& Unclean, sf::Clock& uncleanGameClock, float& hungerTimeBetweenSwitch, float& energyTimeBetweenSwitch, float& boredomTimeBetweenSwitch, Currency &currency, Bar &currencyBar)
 {
+	// Checks if the minigame is finished
 	if (bathBar.getValue() == 6)
 	{
+		// If the minigame is finished, set the minigame to inactive
 		active = false;
+
+		// Set the unclean debuff to inactive
 		Unclean.setActive(false);
+
+		// Reset the unclean debuff clock
 		uncleanGameClock.restart();
 		hungerTimeBetweenSwitch += 10.0f;
 		energyTimeBetweenSwitch += 10.0f;
 		boredomTimeBetweenSwitch += 10.0f;
+
+		// Award currency
 		overSponge = false;
 		currency.setActive(true);
 		int newCurrencyValue = currencyBar.getValue() + 1;

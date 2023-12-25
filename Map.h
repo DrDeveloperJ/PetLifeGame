@@ -13,8 +13,7 @@ public:
 	Map();
 	~Map();
 
-	void Load(std::string Dir);
-	void Update();
-	void setPosition(const sf::Vector2f Position);
+	void Load(std::string Dir);						// Loads the texture from the directory
+	void setPosition(const sf::Vector2f Position);  // Sets the position of the map
 };
 

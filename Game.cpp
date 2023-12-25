@@ -20,14 +20,12 @@ Game::Game()
 
     Timer time; //Instantiates a Timer, when the scope of this function ends, the destructor is called and the timer ends
 
-    // Loads the assets
+    // The defined lambda functions for loading each asset
     auto ArialLoad = [this] {
         if (arial.loadFromFile("Assets/Fonts/arial/arial.ttf"))
         {
             std::cout << "Loaded Arial" << std::endl;
-        }
-
-        };
+        }};
     auto MapLoad = [this] {map.Load("Assets/Map/WholeMapNew.png"); };
     auto TitleLoad = [this] {title.Load("Assets/GameTitle.png"); };
     auto PlayerLoad = [this] {player.Load("Assets/Player/Textures/CatResized/Cat_SpriteSheet.png"); };
@@ -61,9 +59,13 @@ Game::Game()
         welcome.setPosition({ 575, 315 });
         };
     auto PlayAroundLoad = [this] {
-        playAround.Load("Assets/Buttons/PlayAround.png", "Assets/Buttons/OnPlayAround.png", { 184, 50 }, 0, 0, 200, 50);
-        playAround.setPosition({ 275, 585 });
+        playAround.Load("Assets/Buttons/PlayingMinigame/PlayAround.png", "Assets/Buttons/PlayingMinigame/OnPlayAround.png", { 102, 102 }, 0, 0, 102, 102);
+        playAround.setPosition({ 613, 550 });
         };
+    auto PlayingMinigameLoad = [this] {
+		playingMinigame.Load("Assets/Minigames/PlayingMinigame/PlayingBG.png", "Assets/Minigames/PlayingMinigame/Explosion.png", "Assets/Minigames/PlayingMinigame/Mouse.png");
+		playingMinigame.Initialize({ 100, 90 });
+		};
     auto GoInsideLoad = [this] {
         goInside.Load("Assets/Buttons/GoInside.png", "Assets/Buttons/OnGoInside.png", { 184, 50 }, 0, 0, 200, 50);
         goInside.setPosition({ 875, 585 });
@@ -131,7 +133,7 @@ Game::Game()
 		kitchenTableOverlay.setPosition({ 0, 0 });
 		};
 
-    // Parallel Processing is used here by splitting each asset that is loaded into multiple threads
+    // Parallel Processing is used here by splitting each asset loading into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
     std::jthread MapLoadThread(MapLoad);
     std::jthread TitleLoadThread(TitleLoad);
@@ -143,6 +145,7 @@ Game::Game()
     std::jthread BoredomBarLoadThread(boredomBarLoad);
     std::jthread WelcomeLoadThread(WelcomeLoad);
     std::jthread PlayAroundLoadThread(PlayAroundLoad);
+    std::jthread PlayingMinigameLoadThread(PlayingMinigameLoad);
     std::jthread GoInsideLoadThread(GoInsideLoad);
     std::jthread EntryWayLoadThread(EntryWayLoad);
     std::jthread KitchenLoadThread(KitchenLoad);
@@ -184,23 +187,47 @@ void Game::updateSFMLEvents()
             {
                 welcome.MouseOver(*window);
             }
+
             if (currentArea == "Outside")
             {
-                goInside.MouseOver(*window);
-                playAround.MouseOver(*window);
+                if (!playingMinigame.isActive())
+                {
+                    // The play around button is disabled if the boredom bar is full
+                    if (boredomBar.getValue() == 6)
+                    {
+                        playAround.setTexture(102, 0, 102, 102);
+                        playAround.active = false;
+                    }
+                    // Else, the play around button is enabled as well as the go inside button
+                    else
+                    {
+                        playAround.setTexture(0, 0, 102, 102);
+                        playAround.MouseOver(*window);
+                        playAround.active = true;
 
+                        goInside.MouseOver(*window);
+                        playAround.MouseOver(*window);
+                    }
+                }
             }
+
+            // If the player is in the entry way, kitchen, bedroom, or bathroom, check if the mouse is over the buttons for switching areas
             if ((currentArea == "EntryWay") || (currentArea == "Kitchen") || (currentArea == "Bedroom") || (currentArea == "Bathroom"))
             {
+                // Applies rollover effect to the buttons
                 EntryWay.MouseOver(*window);
                 Kitchen.MouseOver(*window);
                 Bedroom.MouseOver(*window);
                 Bathroom.MouseOver(*window);
             }
+
+            // If the player is in the entry way only then can they leave the house
             if (currentArea == "EntryWay")
             {
                 GoOutside.MouseOver(*window);
             }
+
+            // If the player is in the bathroom, check if the mouse is over the bath button unless the bathroom minigame is active
             if (currentArea == "Bathroom")
             {
                 if (bathMinigame.isActive())
@@ -213,6 +240,8 @@ void Game::updateSFMLEvents()
                     bathButton.MouseOver(*window);
                 }
             }
+
+            // If the player is in the bedroom, check if the mouse is over the sleep button, unless sleeping where the wake button should be active
             if (currentArea == "Bedroom")
             {
                 if (sleepFunctionality.getActive())
@@ -224,6 +253,8 @@ void Game::updateSFMLEvents()
                     sleepButton.MouseOver(*window);
                 }
             }
+
+            // If the player is in the kitchen, check if the mouse is over the eat button unless the eat minigame is active
             if (currentArea == "Kitchen")
             {
                 if (!eatingMinigame.isActive())
@@ -257,17 +288,37 @@ void Game::updateSFMLEvents()
                     map.setPosition({ -1350, 0 }); // Sets the map's initial position
                 }
             }
+
+            // If the player is outside, check if the mouse is over the play around button or the go inside button
             if (currentArea == "Outside")
             {
-                if (goInside.ButtonState == 1)
+                if (playingMinigame.isActive())
                 {
-                    std::cout << "Go Inside" << std::endl;
-                    currentArea = "EntryWay";
-                    map.setPosition({ -2700, 0 });
-                    goInside.switchState(0);
+                    if (playingMinigame.IsOverMouse(*window))
+                    {
+                        playingMinigame.MouseBlast(boredomBar);
+					}
+                }
+                else
+                {
+                    if (goInside.ButtonState == 1)
+                    {
+                        std::cout << "Go Inside" << std::endl;
+                        currentArea = "EntryWay";
+                        map.setPosition({ -2700, 0 });
+                        goInside.switchState(0);
+                    }
+
+                    if (playAround.ButtonState == 1)
+                    {
+                        std::cout << "PlayAroundMinigameOpen" << std::endl;
+                        playingMinigame.SetActive(true, boredomBar);
+                        playAround.switchState(0);
+                    }
                 }
             }
 
+            // If the player is in the entry way, kitchen, bedroom, or bathroom, check if the mouse is over the buttons for switching areas, and do so if it is
             if ((currentArea == "EntryWay") || (currentArea == "Kitchen") || (currentArea == "Bedroom") || (currentArea == "Bathroom"))
             {
                 if (EntryWay.ButtonState == 1)
@@ -300,6 +351,7 @@ void Game::updateSFMLEvents()
                 }
             }
 
+            // If the player is in the bathroom, check if the mouse is over the bath button and open the bath minigame if it is
             if (currentArea == "Bathroom")
             {
                 if ((bathButton.ButtonState == 1) && (Unclean.getActive()))
@@ -310,6 +362,7 @@ void Game::updateSFMLEvents()
                 }
             }
 
+            // If the player is in the entry way only then can they leave the house
             if (currentArea == "EntryWay")
             {
                 if (GoOutside.ButtonState == 1)
@@ -320,6 +373,8 @@ void Game::updateSFMLEvents()
                     GoOutside.switchState(0);
                 }
             }
+
+            // If the player is in the bedroom, check if the mouse is over the sleep button, unless sleeping where the wake button should be active
             if (currentArea == "Bedroom")
             {
                 if (sleepFunctionality.getActive())
@@ -351,6 +406,8 @@ void Game::updateSFMLEvents()
                     }
                 }
             }
+
+            // If the player is in the kitchen, check if the mouse is over the eat button (To open the eat minigame) unless the eat minigame is activeu
             if (currentArea == "Kitchen")
             {
                 if (eatButton.ButtonState == 1)
@@ -362,6 +419,7 @@ void Game::updateSFMLEvents()
 
                 if (eatingMinigame.isActive())
                 {
+                    // If the mouse is over the food, switch the food's state based on whether the food is correct or not
                     bool isOverFood1{ eatingMinigame.IsOverFood(*window, 1) };
                     eatingMinigame.FoodSwitchState(1, isOverFood1, hungerBar);
                     bool isOverFood2{ eatingMinigame.IsOverFood(*window, 2) };
@@ -390,23 +448,27 @@ void Game::update()
     this->updateSFMLEvents();
 
     player.movementAllow = true;
-    player.Update();
-    map.Update();
 
     if (!welcomeEnabled)
     {
+        // The deltatime is used to make the animation of the player work
         deltatime = clock.restart().asSeconds();
+
+        // Sleeping animation only if in the bedroom and sleeping
         if ((currentArea == "Bedroom") && (sleepFunctionality.getActive()))
         {
             player.AnimationUpdate(3318, deltatime, 0.15f); // Sets the player's animation
         }
+        // IDLE animation
         else
         {
             player.AnimationUpdate(0, deltatime, 0.15f); // Sets the player's animation
         }
 
+        // sleepingZIncrement is used to make the Z's come out at a regular interval
         sleepingZIncrement += deltatime;
 
+        // If the sleepingZIncrement is greater than 0.4 seconds, switch the Z's position (gives the illusion of the Z's coming from the cat)
         if (sleepingZIncrement >= 0.4f)
         {
             sleepingZIncrement = 0;
@@ -428,11 +490,13 @@ void Game::update()
             }
         }
 
+        // If the currency is active, update the currency's animation (show the coin spinning)
         if (currency.getActive())
         {
             currency.AnimationUpdate(deltatime, 0.075f);
         }
 
+        // Get the time for each bar and the sponge and food minigames movement
         hungerGameTime = hungerGameClock.getElapsedTime().asSeconds();
         energyGameTime = energyGameClock.getElapsedTime().asSeconds();
         boredomGameTime = boredomGameClock.getElapsedTime().asSeconds();
@@ -441,18 +505,22 @@ void Game::update()
         spongeMoveAroundTime = spongeBathClock.getElapsedTime().asSeconds();
         foodMoveAroundTime = foodGameClock.getElapsedTime().asSeconds();
 
+        // If the player is not sleeping and the energy bar goes lower than 2, allow the player to gain a currency as a reward
         if (!sleepFunctionality.getActive())
         {
             if (energyBar.getValue() <= 2)
             {
                 sleepFunctionality.setRewardAllowed(true);
             }
+
+            // If the player is not sleeping, decrement the energy bar
             energyBar.DecrementValue(1, energyGameTime, energyTimeBetweenSwitch);
         }
-        else
+        else // If the player is sleeping, increment the energy bar, and if allowed, give the player a currency as a reward
         {
             energyIncrementTime = energyIncrementClock.getElapsedTime().asSeconds();
             energyBar.IncrementValue(1, energyIncrementTime, energyTimeBetweenIncrement);
+
             if ((energyBar.getValue() == 6) && (sleepFunctionality.getRewardAllowed()))
             {
                 sleepFunctionality.setRewardAllowed(false);
@@ -461,9 +529,12 @@ void Game::update()
                 currencyBar.updateValue(newCurrencyValue);
             }
         }
+
+        // If the player is not sleeping, decrement the hunger bar and boredom bar
         hungerBar.DecrementValue(1, hungerGameTime, hungerTimeBetweenSwitch);
         boredomBar.DecrementValue(1, boredomGameTime, boredomTimeBetweenSwitch);
 
+        // Restart the clocks for each bar and the sponge and food minigames movement
         if (hungerGameTime >= hungerTimeBetweenSwitch)
         {
             hungerGameTime = hungerGameClock.restart().asSeconds();
@@ -481,8 +552,10 @@ void Game::update()
             boredomGameTime = boredomGameClock.restart().asSeconds();
         }
 
+        // The unclean debuff is active after a set amount of time
         if ((uncleanGameTime >= uncleanTimeBetweenSwitch) && (!Unclean.getActive()) && (!bathMinigame.isActive()))
         {
+            // Prepares the bath minigame for use
             Unclean.setActive(true);
             bathMinigame.bathBar.resetValue();
             bathMinigame.bathBar.setCurrentX(1200);
@@ -493,7 +566,23 @@ void Game::update()
             uncleanGameTime = uncleanGameClock.restart().asSeconds();
         }
 
-        if (hungerBar.getValue() == 0 && energyBar.getValue() == 0 && boredomBar.getValue() == 0)
+        int checkDecrementHealth = 0;
+
+        if (hungerBar.getValue() == 0)
+        {
+            checkDecrementHealth++;
+        }
+        if (energyBar.getValue() == 0)
+        {
+            checkDecrementHealth++;
+        }
+        if (boredomBar.getValue() == 0)
+        {
+            checkDecrementHealth++;
+        }
+
+        //decrement the health bar if 2 bars are empty
+        if (checkDecrementHealth >= 2)
         {
             healthBar.DecrementHealthValue(1, healthGameTime, healthTimeBetweenSwitch);
             if (healthGameTime >= healthTimeBetweenSwitch)
@@ -503,6 +592,16 @@ void Game::update()
         }
     }
 
+    // If the play around game is active, check if the playing minigame is finished
+    if (currentArea == "Outside")
+    {
+        if (playingMinigame.isActive())
+        {
+            playingMinigame.MiniGameFinishedCheck(boredomBar, currency, currencyBar);
+		}
+	}
+
+    // If the bath minigame is active, move the sponge around randomly
     if (currentArea == "Bathroom")
     {
         if (bathMinigame.isActive())
@@ -511,20 +610,24 @@ void Game::update()
 
             bathTime = bathClock.getElapsedTime().asSeconds();
 
+            // If the bath minigame is active and the mouse is over the sponge, increment the bath bar
             if ((bathTime >= bathTimeBetweenSwitch) && (bathMinigame.isOverSponge()))
             {
                 bathMinigame.bathBar.IncrementValue(1, bathTime, bathTimeBetweenSwitch);
                 bathTime = bathClock.restart().asSeconds();
             }
 
+            // if the mouse goes off the sponge stop incrementing the bath bar
             if (!bathMinigame.isOverSponge())
             {
                 bathTime = bathClock.restart().asSeconds();
             }
 
+            // Check if the bath minigame is finished
             bathMinigame.miniGameFinishedCheck(Unclean, uncleanGameClock, hungerTimeBetweenSwitch, energyTimeBetweenSwitch, boredomTimeBetweenSwitch, currency, currencyBar);
         }
 
+        // Set the bathbutton to active or inactive based on whether the unclean debuff is active
         if ((!Unclean.getActive()) && (bathButton.active))
         {
             bathButton.active = false;
@@ -538,6 +641,7 @@ void Game::update()
         }
     }
 
+    // If the eating minigame is active, check if the eating minigame is finished
     if (currentArea == "Kitchen")
     {
         if (eatingMinigame.isActive())
@@ -566,6 +670,7 @@ void Game::render()
         this->window->draw(title.Sprite);
         welcome.DrawTo(*window);
     }
+    // Otherwise, draw the game
     else
     {
         if (currency.getActive())
@@ -575,8 +680,16 @@ void Game::render()
 
         if (currentArea == "Outside")
         {
-            goInside.DrawTo(*window);
-            playAround.DrawTo(*window);
+            if (playingMinigame.isActive())
+            {
+				playingMinigame.Draw(*window);
+			}
+            else
+            {
+                goInside.DrawTo(*window);
+                playAround.DrawTo(*window);
+            }
+
             currencyBar.DrawTo(*window);
             healthBar.DrawSpriteOnlyTo(*window);
             hungerBar.DrawSpriteOnlyTo(*window);

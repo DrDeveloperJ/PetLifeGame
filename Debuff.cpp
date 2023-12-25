@@ -11,6 +11,7 @@ Debuff::~Debuff()
 
 void Debuff::Load(std::string dir, sf::Vector2f Scale)
 {
+	// Load the texture and set the sprite
 	if (DebuffTexture.loadFromFile(dir))
 	{
 		std::cout << "Loaded Debuff Texture" << std::endl;
@@ -26,31 +27,30 @@ void Debuff::Load(std::string dir, sf::Vector2f Scale)
 
 void Debuff::Initialize(float newchange)
 {
+	// Set the change
 	change = newchange;
 }
 
 void Debuff::setPosition(sf::Vector2f position)
 {
+	// Set the position
 	Sprite.setPosition(position);
 }
 
 void Debuff::setActive(bool newactive)
 {
+	// Set the active
 	active = newactive;
 }
 
 bool Debuff::getActive()
 {
-	switch (active)
-	{
-		case true:
-			return true;
-		case false:
-			return false;
-	}
+	// Return active
+	return active;
 }
 
 void Debuff::DrawTo(sf::RenderWindow& window)
 {
+	// Draw the sprite
 	window.draw(Sprite);
 }

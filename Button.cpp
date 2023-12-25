@@ -2,6 +2,7 @@
 
 void Button::Load(std::string dir, std::string OnDir, sf::Vector2f Size, int NoPressindexX, int NoPressindexY, int NoPressSizeX, int NoPressSizeY)
 {
+	// Load the texture for the button
 	if (ButtonTexture.loadFromFile(dir))
 	{
 		std::cout << "Loaded Button Texture" << std::endl;
@@ -13,6 +14,7 @@ void Button::Load(std::string dir, std::string OnDir, sf::Vector2f Size, int NoP
 		std::cout << "Failed to load Button Texture" << std::endl;
 	}
 
+	// Load the rollover texture for the button
 	if (OnButtonTexture.loadFromFile(OnDir))
 	{
 		std::cout << "Loaded OnButton Texture" << std::endl;
@@ -22,6 +24,7 @@ void Button::Load(std::string dir, std::string OnDir, sf::Vector2f Size, int NoP
 		std::cout << "Failed to load OnButton Texture" << std::endl;
 	}
 
+	// Set the size of the button
 	button.setSize(Size);
 	button.setFillColor(sf::Color::Transparent);
 }
@@ -32,6 +35,7 @@ Button::Button()
 
 void Button::switchState(int state)
 {
+	// Switches the state of the button
 	switch (state)
 	{
 	case 0:
@@ -47,11 +51,13 @@ void Button::switchState(int state)
 
 void Button::setTexture(int indexX, int indexY, int sizeX, int sizeY)
 {
+	// Sets the texture of the button
 	Sprite.setTextureRect(sf::Rect(indexX, indexY, sizeX, sizeY));
 }
 
 void Button::MouseOver(sf::RenderWindow& window)
 {
+	// Checks if the mouse is over the button and changes the state accordingly
 	if (active)
 	{
 		float mouseX = sf::Mouse::getPosition(window).x;
@@ -76,12 +82,14 @@ void Button::MouseOver(sf::RenderWindow& window)
 
 void Button::setPosition(sf::Vector2f Position)
 {
+	// Sets the position of the button
 	button.setPosition({ Position.x + 8, Position.y });
 	Sprite.setPosition(Position);
 }
 
 void Button::DrawTo(sf::RenderWindow& window)
 {
+	// Draws the button
 	window.draw(button);
 	window.draw(Sprite);
 }

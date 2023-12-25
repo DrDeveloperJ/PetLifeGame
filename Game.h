@@ -16,6 +16,7 @@
 #include "Currency.h"
 #include "SleepingFunctionality.h"
 #include "EatingMinigame.h"
+#include "PlayingMinigame.h"
 
 class Game
 {
@@ -51,7 +52,6 @@ private:
 	float bathTimeBetweenSwitch = 0.5f;
 	float energyTimeBetweenIncrement = 1.0f;
 	float foodTimeBetweenSwitch = 4.0f;
-
 
 	float deltatime = 0.0f;
 	float hungerGameTime = 0.0f;
@@ -96,15 +96,17 @@ private:
 	sf::Texture kitchenTableOverlayTexture;
 	sf::Sprite kitchenTableOverlay;
 
+	PlayingMinigame playingMinigame;
+
 	void initWindow();
 
 public:
 	Game();
 	~Game();
-	void updateSFMLEvents();
-	void update();
-	void render();
-	void run();
+	void updateSFMLEvents();	// Update based on SFML events (Inputs)
+	void update();				// Update the game
+	void render();				// Render the game
+	void run();					// Run the game
 
 };
 

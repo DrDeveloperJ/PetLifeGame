@@ -3,6 +3,7 @@
 
 void Currency::Load(std::string dir)
 {
+    // Loads the texture and sets the sprite
     if (currencyTexture.loadFromFile(dir))
     {
         std::cout << "Loaded CurrencyAnimation Texture" << std::endl;
@@ -18,27 +19,32 @@ void Currency::Load(std::string dir)
 
 void Currency::draw(sf::RenderWindow& window)
 {
+    // Draws the currency
 	window.draw(currencySprite);
 }
 
 void Currency::initialize(sf::Vector2f position)
 {
+    // Initializes the currency
     currencySprite.setPosition(position);
     currencySprite.setScale({ 4, 4 });
 }
 
 void Currency::setActive(bool newactive)
 {
+    // Sets the currency to active or inactive
 	active = newactive;
 }
 
 bool Currency::getActive()
 {
+	// Returns if the currency is active or not
 	return active;
 }
 
 void Currency::AnimationUpdate(float deltaTime, float timeBetweenSwitch)
 {
+    // Updates the animation of the currency to show the next frame
     interval += deltaTime;
     if (interval >= timeBetweenSwitch) // If the interval is greater than or equal to the defined time between switch, reset the interval and run the next texture in the animation
     {

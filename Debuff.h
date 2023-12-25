@@ -11,7 +11,6 @@ private:
 public:
 	float change;
 
-public:
 	Debuff();
 	~Debuff();
 

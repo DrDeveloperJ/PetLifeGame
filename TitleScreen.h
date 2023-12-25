@@ -13,7 +13,7 @@ public:
 	TitleScreen();
 	~TitleScreen();
 
-	void Load(std::string Dir);
-	void setPosition(const sf::Vector2f Position);
+	void Load(std::string Dir);						// Load the texture and set the sprite
+	void setPosition(const sf::Vector2f Position);  // Set the position of the sprite
 };
 

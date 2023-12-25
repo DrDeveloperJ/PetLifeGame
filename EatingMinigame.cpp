@@ -12,10 +12,13 @@ EatingMinigame::~EatingMinigame()
 
 void EatingMinigame::Load(std::string backgroundDir, std::string foodDir, std::string correctFoodDir, std::string incorrectFoodDir)
 {
+    // Loads the textures
     backgroundTexture.loadFromFile(backgroundDir);
     foodTexture.loadFromFile(foodDir);
     correctFoodTexture.loadFromFile(correctFoodDir);
     incorrectFoodTexture.loadFromFile(incorrectFoodDir);
+
+    // Sets the sprites
     background.setTexture(backgroundTexture);
     currentLookedForFood.setTexture(foodTexture);
     food1.setTexture(foodTexture);
@@ -30,6 +33,7 @@ void EatingMinigame::Load(std::string backgroundDir, std::string foodDir, std::s
 
 void EatingMinigame::Initialize(sf::Vector2f backgroundPosition)
 {
+    // Initializes the minigame
     background.setPosition(backgroundPosition);
     currentLookedForFood.setPosition({ 600, 70 });
     food1.setPosition({ 375, 250 });
@@ -52,6 +56,7 @@ bool EatingMinigame::CheckCorrectFood(sf::Sprite* foodPick)
     int LookedForFoodY = currentLookedForFood.getTextureRect().top;
     int LookedForFoodX = currentLookedForFood.getTextureRect().left;
 
+    // if the food is correct return true, else return false
     if ((currentFoodY == LookedForFoodY) && (currentFoodX == LookedForFoodX))
     {
         return true;
@@ -64,6 +69,7 @@ bool EatingMinigame::CheckCorrectFood(sf::Sprite* foodPick)
 
 void EatingMinigame::FoodSwitchState(const int& foodNumber, bool& state, Bar& hungerBar)
 {
+    // Switches the food to the incorrect state, if it is incorrect, else switches all the foods around
     sf::Sprite* foodPick;
     switch (foodNumber)
     {
@@ -113,6 +119,7 @@ void EatingMinigame::FoodSwitchState(const int& foodNumber, bool& state, Bar& hu
 
 void EatingMinigame::SetFoodType(int food, int randomFoodChoice)
 {
+    // Sets the type of an individual food
     std::srand(time(0)+food);
     int tempFoodTypeX = rand() % 10;
     std::srand(time(0)-food);
@@ -167,6 +174,7 @@ void EatingMinigame::SetFoodType(int food, int randomFoodChoice)
 
     if (food == randomFoodChoice)
     {
+        // if the function is setting the currentlookedforfood, set it to a random food choice
         currentLookedForFood.setTextureRect(sf::Rect{ tempFoodTypeX * 16, tempFoodTypeY * 16, 16, 16 });
         currentLookedForFood.setScale({ 5, 5 });
     }
@@ -174,6 +182,7 @@ void EatingMinigame::SetFoodType(int food, int randomFoodChoice)
 
 void EatingMinigame::SetEachFoodType()
 {
+    // Calls SetFoodType for each food including the currentLookedForFood
     std::srand(time(0));
     int randomFoodChoice = rand() % 10;
     if (randomFoodChoice > 8)
@@ -195,6 +204,7 @@ void EatingMinigame::SetEachFoodType()
 
 void EatingMinigame::resetFoodTextures()
 {
+    // Resets all the food textures to the default
     food1.setTexture(foodTexture);
 	food2.setTexture(foodTexture);
 	food3.setTexture(foodTexture);
@@ -207,6 +217,7 @@ void EatingMinigame::resetFoodTextures()
 
 bool EatingMinigame::IsOverFood(sf::RenderWindow& window, int food)
 {
+    //returns weither mouse is over the food or not
     if (active)
     {
         sf::Sprite* foodPick;
@@ -266,6 +277,8 @@ bool EatingMinigame::IsOverFood(sf::RenderWindow& window, int food)
 void EatingMinigame::SetActive(bool newActive, Bar& hungerBar)
 {
     active = newActive; // Sets the minigame to active or inactive
+
+    // Check if the hunger bar is low enough to allow a reward
     if (hungerBar.getValue() < 3)
     {
 		allowedReward = true;
@@ -283,9 +296,12 @@ bool EatingMinigame::isActive()
 
 void EatingMinigame::MiniGameFinishedCheck(Bar& hungerBar, Currency& currency, Bar& currencyBar)
 {
+    // Checks if the minigame is finished
     if (hungerBar.getValue() == 6)
     {
 		active = false;
+
+        // Give the reward if allowed
         if (allowedReward)
         {
             currency.setActive(true);

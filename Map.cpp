@@ -11,6 +11,7 @@ Map::~Map()
 
 void Map::Load(std::string Dir)
 {
+    // Load Map Texture and set Sprite to it
     if (MapTexture.loadFromFile(Dir))
     {
         std::cout << "Loaded Map Texture" << std::endl;
@@ -22,12 +23,9 @@ void Map::Load(std::string Dir)
     }
 }
 
-void Map::Update()
-{
-}
-
 void Map::setPosition(const sf::Vector2f Position)
 {
+    // Set Map Position
     Sprite.setPosition(Position);
 }
 

@@ -15,12 +15,12 @@ public:
 	int currentZ = 0;
 
 public:
-	void Load(std::string dir, std::string zDir, sf::Vector2f position);
-	void Draw(sf::RenderWindow& window);
-	void setZ(sf::Vector2f position, sf::Vector2f scale, int rotateDegree);
-	void setActive(bool newactive);
-	bool getActive();
-	void setRewardAllowed(bool newRewardAllowed);
-	bool getRewardAllowed();
+	void Load(std::string dir, std::string zDir, sf::Vector2f position);	// Load the textures
+	void Draw(sf::RenderWindow& window);									// Draw the textures
+	void setZ(sf::Vector2f position, sf::Vector2f scale, int rotateDegree); // Set the position, scale, and rotation of the sleeping Z
+	void setActive(bool newactive); 										// Set the active state of the sleeping functionality
+	bool getActive();														// Return the active state of the sleeping functionality
+	void setRewardAllowed(bool newRewardAllowed);							// Set the weither the player can get a reward or not
+	bool getRewardAllowed();												// Return the weither the player can get a reward or not
 };
 

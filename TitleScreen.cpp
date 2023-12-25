@@ -11,6 +11,7 @@ TitleScreen::~TitleScreen()
 
 void TitleScreen::Load(std::string Dir)
 {
+    // Load the texture from the directory and set the sprite to the texture
     if (TitleTexture.loadFromFile(Dir))
     {
         std::cout << "Loaded Title Texture" << std::endl;
@@ -26,6 +27,7 @@ void TitleScreen::Load(std::string Dir)
 
 void TitleScreen::setPosition(const sf::Vector2f Position)
 {
+    // Set the position of the sprite
     Sprite.setPosition(Position);
 }
 
