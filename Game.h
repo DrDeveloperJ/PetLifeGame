@@ -17,11 +17,16 @@
 #include "SleepingFunctionality.h"
 #include "EatingMinigame.h"
 #include "PlayingMinigame.h"
+#include "DifficultyUI.h"
 
 class Game
 {
 
 private:
+	int difficulty = 1; // 1 = easy, 2 = hard
+	Button difficultyButton;
+	DifficultyUI difficultyUI;
+
 	Player player;
 	Map map;
 	Button welcome;
@@ -43,15 +48,16 @@ private:
 	sf::Clock energyIncrementClock;
 	sf::Clock foodGameClock;
 
-	float hungerTimeBetweenSwitch = 15.0f;
-	float energyTimeBetweenSwitch = 15.0f;
-	float boredomTimeBetweenSwitch = 15.0f;
-	float uncleanTimeBetweenSwitch = 5.0f;
-	float healthTimeBetweenSwitch = 2.0f;
+	float hungerTimeBetweenSwitch = 12.0f;
+	float energyTimeBetweenSwitch = 12.0f;
+	float boredomTimeBetweenSwitch = 12.0f;
+	float uncleanTimeBetweenSwitch = 19.0f;
+	float healthTimeBetweenSwitch = 2.5f;
 	float spongeBathTimeBetweenSwitch = 4.0f;
 	float bathTimeBetweenSwitch = 0.5f;
 	float energyTimeBetweenIncrement = 1.0f;
 	float foodTimeBetweenSwitch = 4.0f;
+	float uncleanDebuffTime = 5.0f;
 
 	float deltatime = 0.0f;
 	float hungerGameTime = 0.0f;

@@ -93,7 +93,7 @@ Game::Game()
     auto UncleanDebuffLoad = [this] {
         Unclean.Load("Assets/Debuffs/UncleanDebuff.png", { 1, 1 });
         Unclean.setPosition({ 1263, 290 });
-        Unclean.Initialize(10.0f);
+        Unclean.Initialize(uncleanDebuffTime);
         };
     auto BathMinigameLoad = [this] {
         bathMinigame.Load("Assets/Minigames/LightBlueBG.png", "Assets/Minigames/Sponge.png", "Assets/Minigames/OnSponge.png", "Assets/Bars/Bath/spritesheet.png");
@@ -132,6 +132,14 @@ Game::Game()
 		kitchenTableOverlay.setTexture(kitchenTableOverlayTexture);
 		kitchenTableOverlay.setPosition({ 0, 0 });
 		};
+    auto DifficultyButtonLoad = [this] {
+		difficultyButton.Load("Assets/Buttons/DifficultyButton.png", "Assets/Buttons/OnDifficultyButton.png", { 76, 76 }, 0, 0, 76, 76);
+		difficultyButton.setPosition({ 0, 600 });
+		};
+    auto DifficultyUILoad = [this] {
+        difficultyUI.Load("Assets/Settings/Difficulty/DifficultyUIBG.png", "Assets/Settings/Difficulty/EasyButton.png", "Assets/Settings/Difficulty/OnEasyButton.png", "Assets/Settings/Difficulty/HardButton.png", "Assets/Settings/Difficulty/OnHardButton.png");
+        difficultyUI.Initialize({ 375, 145 }, {550, 300}, { 550, 375 }); 
+        };
 
     // Parallel Processing is used here by splitting each asset loading into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
@@ -162,6 +170,8 @@ Game::Game()
     std::jthread eatingMinigameLoadThread(eatingMinigameLoad);
     std::jthread kitchenTableOverlayLoadThread(kitchenTableOverlayLoad);
     std::jthread eatButtonLoadThread(eatButtonLoad);
+    std::jthread DifficultyButtonLoadThread(DifficultyButtonLoad);
+    std::jthread DifficultyUILoadThread(DifficultyUILoad);
 }
 
 // Destructor
@@ -187,6 +197,16 @@ void Game::updateSFMLEvents()
             {
                 welcome.MouseOver(*window);
             }
+            else
+            {
+                // Applies rollover effect to the difficultyUI buttons
+				difficultyButton.MouseOver(*window);
+
+                if (difficultyUI.getActive())
+				{
+					difficultyUI.ButtonsMouseOver(*window);
+				}
+			}
 
             if (currentArea == "Outside")
             {
@@ -198,16 +218,17 @@ void Game::updateSFMLEvents()
                         playAround.setTexture(102, 0, 102, 102);
                         playAround.active = false;
                     }
-                    // Else, the play around button is enabled as well as the go inside button
+                    // Else, the play around button is enabled
                     else
                     {
                         playAround.setTexture(0, 0, 102, 102);
                         playAround.MouseOver(*window);
                         playAround.active = true;
 
-                        goInside.MouseOver(*window);
                         playAround.MouseOver(*window);
                     }
+
+                    goInside.MouseOver(*window);
                 }
             }
 
@@ -286,6 +307,71 @@ void Game::updateSFMLEvents()
                     player.visible = true; // Makes the player visible
                     player.setTexture(0, 0); // Sets the player's texture
                     map.setPosition({ -1350, 0 }); // Sets the map's initial position
+                }
+            }
+            else
+            {
+                // If the difficulty button is pressed, open the difficulty UI and disable the difficulty button
+                if (difficultyButton.ButtonState == 1)
+                {
+					difficultyButton.switchState(0);
+					difficultyButton.active = false;
+                    difficultyUI.setActive(true);
+				}
+
+                if (difficultyUI.getActive())
+                {
+                    // If the easy button is pressed, change the difficulty to easy and disable the difficulty UI
+                    // If the difficulty is already easy, do nothing and disable the difficulty UI
+                    if (difficultyUI.getEasyButtonState() == 1)
+                    {
+                        if (difficulty == 2)
+                        {
+                            hungerTimeBetweenSwitch += 4.0f;
+                            energyTimeBetweenSwitch += 4.0f;
+                            boredomTimeBetweenSwitch += 4.0f;
+                            uncleanTimeBetweenSwitch += 4.0f;
+                            healthTimeBetweenSwitch += 1.5f;
+
+                            difficulty = 1;
+
+                            difficultyButton.active = true;
+                            difficultyUI.setActive(false);
+                        }
+                        else
+                        {
+                            difficultyButton.active = true;
+                            difficultyUI.setActive(false);
+                        }
+
+                        difficultyUI.setEasyButtonState(0);
+                    }
+
+                    // If the hard button is pressed, change the difficulty to hard and disable the difficulty UI
+                    // If the difficulty is already hard, do nothing and disable the difficulty UI
+                    if (difficultyUI.getHardButtonState() == 1)
+					{
+                        if (difficulty == 1)
+                        {
+                            hungerTimeBetweenSwitch -= 4.0f;
+                            energyTimeBetweenSwitch -= 4.0f;
+                            boredomTimeBetweenSwitch -= 4.0f;
+                            uncleanTimeBetweenSwitch -= 4.0f;
+                            healthTimeBetweenSwitch -= 1.5f;
+
+                            difficulty = 2;
+
+                            difficultyButton.active = true;
+                            difficultyUI.setActive(false);
+                        }
+                        else
+                        {
+                            difficultyButton.active = true;
+                            difficultyUI.setActive(false);
+                        }
+
+                        difficultyUI.setHardButtonState(0);
+					}
                 }
             }
 
@@ -696,6 +782,7 @@ void Game::render()
             energyBar.DrawSpriteOnlyTo(*window);
             boredomBar.DrawSpriteOnlyTo(*window);
         }
+
         if (currentArea == "EntryWay")
         {
             EntryWay.DrawTo(*window);
@@ -800,6 +887,17 @@ void Game::render()
         if (Unclean.getActive())
         {
             Unclean.DrawTo(*window);
+        }
+
+        if (difficultyUI.getActive())
+		{
+            //std::cout << "Difficulty UI Active" << std::endl;
+			difficultyUI.drawTo(*window);
+		}
+        else
+        {
+            // Only draw the difficulty button if the difficulty UI is not active (so must choose difficulty first)
+            difficultyButton.DrawTo(*window);
         }
     }
 
