@@ -26,7 +26,7 @@ Game::Game()
         {
             std::cout << "Loaded Arial" << std::endl;
         }};
-    auto MapLoad = [this] {map.Load("Assets/Map/WholeMapNew.png"); };
+    auto MapLoad = [this] {map.Load("Assets/Map/WholeMap1.png", "Assets/Map/WholeMap2.png", "Assets/Map/WholeMap3.png", "Assets/Map/WholeMap4.png"); };
     auto TitleLoad = [this] {title.Load("Assets/GameTitle.png"); };
     auto PlayerLoad = [this] {player.Load("Assets/Player/Textures/CatResized/Cat_SpriteSheet.png"); };
     auto CurrencyBarLoad = [this] {
@@ -140,6 +140,16 @@ Game::Game()
         difficultyUI.Load("Assets/Settings/Difficulty/DifficultyUIBG.png", "Assets/Settings/Difficulty/EasyButton.png", "Assets/Settings/Difficulty/OnEasyButton.png", "Assets/Settings/Difficulty/HardButton.png", "Assets/Settings/Difficulty/OnHardButton.png");
         difficultyUI.Initialize({ 375, 145 }, {550, 300}, { 550, 375 }); 
         };
+    auto MapShopButtonLoad = [this] {
+        shopButton.Load("Assets/Settings/Shop/MapShopButton.png", "Assets/Settings/Shop/OnMapShopButton.png", { 70, 70 }, 0, 0, 70, 70);
+        shopButton.setPosition({ 102, 604 });
+        };
+    auto MapShopLoad = [this] {
+		mapShop.Load("Assets/Settings/Shop/MapShopUI.png", "Assets/Settings/Shop/Map1Button.png", "Assets/Settings/Shop/OnMap1Button.png", "Assets/Settings/Shop/Map2Button.png", "Assets/Settings/Shop/OnMap2Button.png", "Assets/Settings/Shop/Map3Button.png", "Assets/Settings/Shop/OnMap3Button.png", "Assets/Settings/Shop/Map4Button.png", "Assets/Settings/Shop/OnMap4Button.png");
+		mapShop.Initialize({ 350, 125 }, { 431, 325 }, { 700, 325 }, { 431, 475 }, { 700, 475 });
+        mapShop.setPurchased(1);
+        mapShop.setActive(true);
+		};
 
     // Parallel Processing is used here by splitting each asset loading into multiple threads
     std::jthread ArialLoadThread(ArialLoad);
@@ -172,6 +182,8 @@ Game::Game()
     std::jthread eatButtonLoadThread(eatButtonLoad);
     std::jthread DifficultyButtonLoadThread(DifficultyButtonLoad);
     std::jthread DifficultyUILoadThread(DifficultyUILoad);
+    std::jthread MapShopButtonLoadThread(MapShopButtonLoad);
+    std::jthread MapShopLoadThread(MapShopLoad);
 }
 
 // Destructor
@@ -229,6 +241,13 @@ void Game::updateSFMLEvents()
                     }
 
                     goInside.MouseOver(*window);
+
+                    if (mapShop.getActive())
+                    {
+						mapShop.ButtonsMouseOver(*window);
+                    }
+
+                    shopButton.MouseOver(*window);
                 }
             }
 
@@ -387,7 +406,7 @@ void Game::updateSFMLEvents()
                 }
                 else
                 {
-                    if (goInside.ButtonState == 1)
+                    if ((goInside.ButtonState == 1) && (!mapShop.getActive()))
                     {
                         std::cout << "Go Inside" << std::endl;
                         currentArea = "EntryWay";
@@ -395,11 +414,136 @@ void Game::updateSFMLEvents()
                         goInside.switchState(0);
                     }
 
-                    if (playAround.ButtonState == 1)
+                    if ((playAround.ButtonState == 1) && (!mapShop.getActive()))
                     {
                         std::cout << "PlayAroundMinigameOpen" << std::endl;
                         playingMinigame.SetActive(true, boredomBar);
                         playAround.switchState(0);
+                    }
+
+                    // If map shop is open
+                    if (mapShop.getActive())
+                    {
+                        if (mapShop.getMap1ButtonState() == 1)
+                        {
+                            // If the map is not purchased and the player has enough currency, then switch to the map, close the map shop, and ammend the currency
+                            if ((!mapShop.getPurchased(1)) && (currencyBar.getValue() >= 0))
+                            {
+                                std::cout << "Map 1" << std::endl;
+                                map.switchMap(1);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(1);
+                                mapShop.setPurchased(1);
+                                mapShop.setMap1ButtonState(0);
+
+                                int newvalue{ currencyBar.getValue() - 0 };
+                                currencyBar.updateValue(newvalue);
+							}
+                            // If already purchased the map, then switch to the map and close the map shop.
+                            else if (mapShop.getPurchased(1))
+                            {
+								std::cout << "Map 1" << std::endl;
+								map.switchMap(1);
+								mapShop.setActive(false);
+								mapShop.resetOtherButtons(1);
+								mapShop.setMap1ButtonState(0);
+                                mapShop.setCurrentButton(1);
+							}
+						}
+
+                        if (mapShop.getMap2ButtonState() == 1)
+                        {
+                            // If the map is not purchased and the player has enough currency, then switch to the map, close the map shop, and ammend the currency
+                            if ((!mapShop.getPurchased(2)) && (currencyBar.getValue() >= 10))
+                            {
+                                std::cout << "Map 2" << std::endl;
+                                map.switchMap(2);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(2);
+                                mapShop.setPurchased(2);
+                                mapShop.setMap2ButtonState(0);
+
+                                int newvalue{ currencyBar.getValue() - 10 };
+                                currencyBar.updateValue(newvalue);
+                            }
+                            // If already purchased the map, then switch to the map and close the map shop.
+                            else if (mapShop.getPurchased(2))
+                            {
+                                std::cout << "Map 2" << std::endl;
+                                map.switchMap(2);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(2);
+                                mapShop.setMap2ButtonState(0);
+                                mapShop.setCurrentButton(2);
+							}
+						}
+
+                        if (mapShop.getMap3ButtonState() == 1)
+                        {
+                            // If the map is not purchased and the player has enough currency, then switch to the map, close the map shop, and ammend the currency
+                            if ((!mapShop.getPurchased(3)) && (currencyBar.getValue() >= 20))
+                            {
+                                std::cout << "Map 3" << std::endl;
+                                map.switchMap(3);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(3);
+                                mapShop.setPurchased(3);
+                                mapShop.setMap3ButtonState(0);
+                                
+                                int newvalue{ currencyBar.getValue() - 20 };
+                                currencyBar.updateValue(newvalue);
+                            }
+                            // If already purchased the map, then switch to the map and close the map shop.
+                            else if (mapShop.getPurchased(3))
+                            {
+                                std::cout << "Map 3" << std::endl;
+                                map.switchMap(3);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(3);
+                                mapShop.setMap3ButtonState(0);
+                                mapShop.setCurrentButton(3);
+                            }
+						}
+                        if (mapShop.getMap4ButtonState() == 1)
+                        {
+                            // If the map is not purchased and the player has enough currency, then switch to the map, close the map shop, and ammend the currency
+                            if ((!mapShop.getPurchased(4)) && (currencyBar.getValue() >= 50))
+                            {
+                                std::cout << "Map 4" << std::endl;
+                                map.switchMap(4);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(4);
+                                mapShop.setPurchased(4);
+                                mapShop.setMap4ButtonState(0);
+
+                                int newvalue{ currencyBar.getValue() - 50 };
+                                currencyBar.updateValue(newvalue);
+                            }
+                            // If already purchased the map, then switch to the map and close the map shop.
+                            else if (mapShop.getPurchased(4))
+                            {
+                                std::cout << "Map 4" << std::endl;
+                                map.switchMap(4);
+                                mapShop.setActive(false);
+                                mapShop.resetOtherButtons(4);
+                                mapShop.setMap4ButtonState(0);
+                                mapShop.setCurrentButton(4);
+                            }
+						}
+                    }
+
+                    // Open and Close the Map Shop
+                    if ((shopButton.ButtonState == 1) && (!mapShop.getActive()))
+                    {
+                        std::cout << "MapShop" << std::endl;
+                        mapShop.setActive(true);
+                        shopButton.switchState(0);
+                    }
+                    else if ((shopButton.ButtonState == 1) && (mapShop.getActive()))
+                    {
+                        std::cout << "Close MapShop" << std::endl;
+                        mapShop.setActive(false);
+                        shopButton.switchState(0);
                     }
                 }
             }
@@ -774,6 +918,13 @@ void Game::render()
             {
                 goInside.DrawTo(*window);
                 playAround.DrawTo(*window);
+
+                if (mapShop.getActive())
+                {
+					mapShop.drawTo(*window);
+				}
+
+                shopButton.DrawTo(*window);
             }
 
             currencyBar.DrawTo(*window);

@@ -55,6 +55,13 @@ void Button::setTexture(int indexX, int indexY, int sizeX, int sizeY)
 	Sprite.setTextureRect(sf::Rect(indexX, indexY, sizeX, sizeY));
 }
 
+void Button::updateButtonTexture(sf::Texture& texture, sf::Texture& onTexture)
+{
+	// Sets the texture of the button to the new textures
+	ButtonTexture.update(texture);
+	OnButtonTexture.update(onTexture);
+}
+
 void Button::MouseOver(sf::RenderWindow& window)
 {
 	// Checks if the mouse is over the button and changes the state accordingly

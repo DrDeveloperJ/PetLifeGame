@@ -18,6 +18,7 @@
 #include "EatingMinigame.h"
 #include "PlayingMinigame.h"
 #include "DifficultyUI.h"
+#include "Shop.h"
 
 class Game
 {
@@ -103,6 +104,9 @@ private:
 	sf::Sprite kitchenTableOverlay;
 
 	PlayingMinigame playingMinigame;
+
+	Button shopButton;
+	Shop mapShop;
 
 	void initWindow();
 
