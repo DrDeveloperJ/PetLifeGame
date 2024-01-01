@@ -6,6 +6,12 @@
 #include <SFML/Network.hpp>
 
 #include <iostream>
+#include <array>
+#include <functional>
+#include <future>
+#include <vector>
+#include <thread>
+
 #include "Player.h"
 #include "Map.h"
 #include "Button.h"
@@ -19,6 +25,7 @@
 #include "PlayingMinigame.h"
 #include "DifficultyUI.h"
 #include "Shop.h"
+#include "GameOver.h"
 
 class Game
 {
@@ -28,11 +35,15 @@ private:
 	Button difficultyButton;
 	DifficultyUI difficultyUI;
 
+	// Create a vector to store the futures
+	std::vector<std::future<void>> futures;
+
 	Player player;
 	Map map;
 	Button welcome;
 	TitleScreen title;
 	bool welcomeEnabled = true;
+	GameOver gameOver;
 
 	sf::Font arial;
 	sf::RenderWindow* window;

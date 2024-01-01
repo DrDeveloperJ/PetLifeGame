@@ -19,171 +19,153 @@ Game::Game()
     player.Initialize();
 
     Timer time; //Instantiates a Timer, when the scope of this function ends, the destructor is called and the timer ends
-
-    // The defined lambda functions for loading each asset
-    auto ArialLoad = [this] {
+    
+    // Parallel Processing is used here by splitting each asset loading into multiple threads
+    std::jthread ArialLoad([this] {
         if (arial.loadFromFile("Assets/Fonts/arial/arial.ttf"))
         {
             std::cout << "Loaded Arial" << std::endl;
-        }};
-    auto MapLoad = [this] {map.Load("Assets/Map/WholeMap1.png", "Assets/Map/WholeMap2.png", "Assets/Map/WholeMap3.png", "Assets/Map/WholeMap4.png"); };
-    auto TitleLoad = [this] {title.Load("Assets/GameTitle.png"); };
-    auto PlayerLoad = [this] {player.Load("Assets/Player/Textures/CatResized/Cat_SpriteSheet.png"); };
-    auto CurrencyBarLoad = [this] {
+        }
+        });
+    std::jthread MapLoad([this] { map.LoadMap1("Assets/Map/WholeMap1.png"); });
+    std::jthread TitleLoad ([this] {title.Load("Assets/GameTitle.png"); });
+    std::jthread PlayerLoad ([this] {player.Load("Assets/Player/Textures/CatResized/Cat_SpriteSheet.png"); });
+    std::jthread CurrencyBarLoad ([this] {
         currencyBar.Initialize(0, { 0.50, 0.50 }, arial);
         currencyBar.Load("Assets/Bars/Currency/CurrencyBar.png");
         currencyBar.setPosition({ 1100, 15 }, { 1225, 32 });
-        };
-    auto healthBarLoad = [this] {
+    });
+    std::jthread healthBarLoad ([this] {
         healthBar.Initialize(false, true, 4, { 4, 4 });
         healthBar.Load("Assets/Bars/Health/Heart.png", 0, 0, 17, 17);
         healthBar.setPosition({ 10, 10 });
-        };
-    auto hungerBarLoad = [this] {
+    });
+    std::jthread hungerBarLoad ([this] {
         hungerBar.Initialize(false, true, 6, { 1.5, 1.5 });
         hungerBar.Load("Assets/Bars/Hunger/spritesheet.png", 0, 0, 200, 100);
         hungerBar.setPosition({ 80, -25 });
-        };
-    auto energyBarLoad = [this] {
+    });
+    std::jthread energyBarLoad ([this] {
         energyBar.Initialize(false, true, 6, { 1.5, 1.5 });
         energyBar.Load("Assets/Bars/Energy/spritesheet.png", 0, 0, 200, 100);
         energyBar.setPosition({ 340, -25 });
-        };
-    auto boredomBarLoad = [this] {
+        });
+    std::jthread boredomBarLoad ([this] {
         boredomBar.Initialize(false, true, 6, { 1.5, 1.5 });
         boredomBar.Load("Assets/Bars/Boredom/spritesheet.png", 0, 0, 200, 100);
         boredomBar.setPosition({ 600, -25 });
-        };
-    auto WelcomeLoad = [this] {
+        });
+    std::jthread WelcomeLoad ([this] {
         welcome.Load("Assets/Buttons/WelcomeButton.png", "Assets/Buttons/OnWelcomeButton.png", { 184, 50 }, 0, 0, 200, 50);
         welcome.setPosition({ 575, 315 });
-        };
-    auto PlayAroundLoad = [this] {
+        });
+    std::jthread PlayAroundLoad ([this] {
         playAround.Load("Assets/Buttons/PlayingMinigame/PlayAround.png", "Assets/Buttons/PlayingMinigame/OnPlayAround.png", { 102, 102 }, 0, 0, 102, 102);
         playAround.setPosition({ 613, 550 });
-        };
-    auto PlayingMinigameLoad = [this] {
-		playingMinigame.Load("Assets/Minigames/PlayingMinigame/PlayingBG.png", "Assets/Minigames/PlayingMinigame/Explosion.png", "Assets/Minigames/PlayingMinigame/Mouse.png");
-		playingMinigame.Initialize({ 100, 90 });
-		};
-    auto GoInsideLoad = [this] {
+        });
+    std::jthread PlayingMinigameLoad ([this] {
+        playingMinigame.Load("Assets/Minigames/PlayingMinigame/PlayingBG.png", "Assets/Minigames/PlayingMinigame/Explosion.png", "Assets/Minigames/PlayingMinigame/Mouse.png");
+        playingMinigame.Initialize({ 100, 90 });
+        });
+    std::jthread GoInsideLoad ([this] {
         goInside.Load("Assets/Buttons/GoInside.png", "Assets/Buttons/OnGoInside.png", { 184, 50 }, 0, 0, 200, 50);
         goInside.setPosition({ 875, 585 });
-        };
-    auto EntryWayLoad = [this] {
+        });
+    std::jthread EntryWayLoad ([this] {
         EntryWay.Load("Assets/Buttons/Interior/EntryWay.png", "Assets/Buttons/Interior/OnEntryWay.png", { 184, 50 }, 0, 0, 200, 50);
         EntryWay.setPosition({ 10, 250 });
-        };
-    auto KitchenLoad = [this] {
+        });
+    std::jthread KitchenLoad ([this] {
         Kitchen.Load("Assets/Buttons/Interior/Kitchen.png", "Assets/Buttons/Interior/OnKitchen.png", { 184, 50 }, 0, 0, 200, 50);
         Kitchen.setPosition({ 10, 300 });
-        };
-    auto BedroomLoad = [this] {
+        });
+    std::jthread BedroomLoad ([this] {
         Bedroom.Load("Assets/Buttons/Interior/Bedroom.png", "Assets/Buttons/Interior/OnBedroom.png", { 184, 50 }, 0, 0, 200, 50);
         Bedroom.setPosition({ 10, 350 });
-        };
-    auto BathroomLoad = [this] {
+        });
+    std::jthread BathroomLoad ([this] {
         Bathroom.Load("Assets/Buttons/Interior/Bathroom.png", "Assets/Buttons/Interior/OnBathroom.png", { 184, 50 }, 0, 0, 200, 50);
         Bathroom.setPosition({ 10, 400 });
-        };
-    auto GoOutsideLoad = [this] {
+        });
+    std::jthread GoOutsideLoad ([this] {
         GoOutside.Load("Assets/Buttons/Interior/GoOutside.png", "Assets/Buttons/Interior/OnGoOutside.png", { 184, 50 }, 0, 0, 200, 50);
         GoOutside.setPosition({ 10, 450 });
-        };
-    auto UncleanDebuffLoad = [this] {
-        Unclean.Load("Assets/Debuffs/UncleanDebuff.png", { 1, 1 });
+        });
+    std::jthread UncleanDebuffLoad ([this] {
         Unclean.setPosition({ 1263, 290 });
-        Unclean.Initialize(uncleanDebuffTime);
-        };
-    auto BathMinigameLoad = [this] {
-        bathMinigame.Load("Assets/Minigames/LightBlueBG.png", "Assets/Minigames/Sponge.png", "Assets/Minigames/OnSponge.png", "Assets/Bars/Bath/spritesheet.png");
+        Unclean.Initialize(uncleanDebuffTime, { 1, 1 });
+        });
+    std::jthread BathMinigameLoad ([this] {
         bathMinigame.Initialize({ 100, 90 }, { 300, 150 }, { 500, 70 });
         bathMinigame.setActive(false);
-        };
-    auto bathButtonLoad = [this] {
+        });
+    std::jthread bathButtonLoad ([this] {
         bathButton.Load("Assets/Buttons/BathButtons/BathButton.png", "Assets/Buttons/BathButtons/OnBathButton.png", { 102, 102 }, 0, 0, 102, 102);
         bathButton.setPosition({ 613, 550 });
-        };
-    auto currencyLoad = [this] {
+        });
+    std::jthread currencyLoad ([this] {
         currency.Load("Assets/Bars/Currency/coin.png");
         currency.initialize({ 638, 250 });
-        };
-    auto sleepFunctionalityLoad = [this] {
+        });
+    std::jthread sleepFunctionalityLoad ([this] {
         sleepFunctionality.Load("Assets/Map/Interior/BedroomLightOffOverlay.png", "Assets/Bars/Energy/SleepingZ.png", { 0, 0 });
-        };
-    auto sleepButtonLoad = [this] {
+        });
+    std::jthread sleepButtonLoad ([this] {
         sleepButton.Load("Assets/Buttons/SleepButtons/SleepButton.png", "Assets/Buttons/SleepButtons/OnSleepButton.png", { 102, 102 }, 0, 0, 102, 102);
         sleepButton.setPosition({ 613, 550 });
-        };
-    auto wakeButtonLoad = [this] {
+        });
+    std::jthread wakeButtonLoad ([this] {
         wakeButton.Load("Assets/Buttons/SleepButtons/OnSleepButton.png", "Assets/Buttons/SleepButtons/SleepButton.png", { 102, 102 }, 0, 0, 102, 102);
         wakeButton.setPosition({ 613, 550 });
-        };
-    auto eatingMinigameLoad = [this] {
+        });
+    std::jthread eatingMinigameLoad ([this] {
         eatingMinigame.Load("Assets/Minigames/EatingMiniGame/EatingBG.png", "Assets/Minigames/EatingMiniGame/Food.png", "Assets/Minigames/EatingMiniGame/CorrectFood.png", "Assets/Minigames/EatingMiniGame/IncorrectFood.png");
         eatingMinigame.Initialize({ 100, 90 });
-        };
-    auto eatButtonLoad = [this] {
+        });
+    std::jthread eatButtonLoad ([this] {
         eatButton.Load("Assets/Buttons/KitchenButtons/EatButton.png", "Assets/Buttons/KitchenButtons/OnEatButton.png", { 102, 102 }, 0, 0, 102, 102);
         eatButton.setPosition({ 613, 550 });
-        };
-    auto kitchenTableOverlayLoad = [this] {
-		kitchenTableOverlayTexture.loadFromFile("Assets/Map/Interior/TableOverlayKitchen.png");
-		kitchenTableOverlay.setTexture(kitchenTableOverlayTexture);
-		kitchenTableOverlay.setPosition({ 0, 0 });
-		};
-    auto DifficultyButtonLoad = [this] {
-		difficultyButton.Load("Assets/Buttons/DifficultyButton.png", "Assets/Buttons/OnDifficultyButton.png", { 76, 76 }, 0, 0, 76, 76);
-		difficultyButton.setPosition({ 0, 600 });
-		};
-    auto DifficultyUILoad = [this] {
+        });
+    std::jthread kitchenTableOverlayLoad ([this] {
+        kitchenTableOverlayTexture.loadFromFile("Assets/Map/Interior/TableOverlayKitchen.png");
+        kitchenTableOverlay.setTexture(kitchenTableOverlayTexture);
+        kitchenTableOverlay.setPosition({ 0, 0 });
+        });
+    std::jthread DifficultyButtonLoad ([this] {
+        difficultyButton.Load("Assets/Buttons/DifficultyButton.png", "Assets/Buttons/OnDifficultyButton.png", { 76, 76 }, 0, 0, 76, 76);
+        difficultyButton.setPosition({ 0, 600 });
+        });
+    std::jthread DifficultyUILoad ([this] {
         difficultyUI.Load("Assets/Settings/Difficulty/DifficultyUIBG.png", "Assets/Settings/Difficulty/EasyButton.png", "Assets/Settings/Difficulty/OnEasyButton.png", "Assets/Settings/Difficulty/HardButton.png", "Assets/Settings/Difficulty/OnHardButton.png");
-        difficultyUI.Initialize({ 375, 145 }, {550, 300}, { 550, 375 }); 
-        };
-    auto MapShopButtonLoad = [this] {
+        difficultyUI.Initialize({ 375, 145 }, { 550, 300 }, { 550, 375 });
+        });
+    std::jthread MapShopButtonLoad ([this] {
         shopButton.Load("Assets/Settings/Shop/MapShopButton.png", "Assets/Settings/Shop/OnMapShopButton.png", { 70, 70 }, 0, 0, 70, 70);
         shopButton.setPosition({ 102, 604 });
-        };
-    auto MapShopLoad = [this] {
-		mapShop.Load("Assets/Settings/Shop/MapShopUI.png", "Assets/Settings/Shop/Map1Button.png", "Assets/Settings/Shop/OnMap1Button.png", "Assets/Settings/Shop/Map2Button.png", "Assets/Settings/Shop/OnMap2Button.png", "Assets/Settings/Shop/Map3Button.png", "Assets/Settings/Shop/OnMap3Button.png", "Assets/Settings/Shop/Map4Button.png", "Assets/Settings/Shop/OnMap4Button.png");
-		mapShop.Initialize({ 350, 125 }, { 431, 325 }, { 700, 325 }, { 431, 475 }, { 700, 475 });
+        });
+    std::jthread MapShopLoad ([this] {
+        mapShop.Load("Assets/Settings/Shop/MapShopUI.png", "Assets/Settings/Shop/Map1Button.png", "Assets/Settings/Shop/OnMap1Button.png", "Assets/Settings/Shop/Map2Button.png", "Assets/Settings/Shop/OnMap2Button.png", "Assets/Settings/Shop/Map3Button.png", "Assets/Settings/Shop/OnMap3Button.png", "Assets/Settings/Shop/Map4Button.png", "Assets/Settings/Shop/OnMap4Button.png");
+        mapShop.Initialize({ 350, 125 }, { 431, 325 }, { 700, 325 }, { 431, 475 }, { 700, 475 });
         mapShop.setPurchased(1);
-        mapShop.setActive(true);
-		};
+        });
 
-    // Parallel Processing is used here by splitting each asset loading into multiple threads
-    std::jthread ArialLoadThread(ArialLoad);
-    std::jthread MapLoadThread(MapLoad);
-    std::jthread TitleLoadThread(TitleLoad);
-    std::jthread PlayerLoadThread(PlayerLoad);
-    std::jthread CurrencyBarLoadThread(CurrencyBarLoad);
-    std::jthread HealthBarLoadThread(healthBarLoad);
-    std::jthread HungerBarLoadThread(hungerBarLoad);
-    std::jthread EnergyBarLoadThread(energyBarLoad);
-    std::jthread BoredomBarLoadThread(boredomBarLoad);
-    std::jthread WelcomeLoadThread(WelcomeLoad);
-    std::jthread PlayAroundLoadThread(PlayAroundLoad);
-    std::jthread PlayingMinigameLoadThread(PlayingMinigameLoad);
-    std::jthread GoInsideLoadThread(GoInsideLoad);
-    std::jthread EntryWayLoadThread(EntryWayLoad);
-    std::jthread KitchenLoadThread(KitchenLoad);
-    std::jthread BedroomLoadThread(BedroomLoad);
-    std::jthread BathroomLoadThread(BathroomLoad);
-    std::jthread GoOutsideLoadThread(GoOutsideLoad);
-    std::jthread UncleanDebuffLoadThread(UncleanDebuffLoad);
-    std::jthread BathMinigameLoadThread(BathMinigameLoad);
-    std::jthread BathButtonLoadThread(bathButtonLoad);
-    std::jthread currencyLoadThread(currencyLoad);
-    std::jthread sleepFunctionalityLoadThread(sleepFunctionalityLoad);
-    std::jthread sleepButtonLoadThread(sleepButtonLoad);
-    std::jthread wakeButtonLoadThread(wakeButtonLoad);
-    std::jthread eatingMinigameLoadThread(eatingMinigameLoad);
-    std::jthread kitchenTableOverlayLoadThread(kitchenTableOverlayLoad);
-    std::jthread eatButtonLoadThread(eatButtonLoad);
-    std::jthread DifficultyButtonLoadThread(DifficultyButtonLoad);
-    std::jthread DifficultyUILoadThread(DifficultyUILoad);
-    std::jthread MapShopButtonLoadThread(MapShopButtonLoad);
-    std::jthread MapShopLoadThread(MapShopLoad);
+    // These assets are loaded asynchronously using threads
+    auto loadMap2 = [this] { map.LoadMap2("Assets/Map/WholeMap2.png"); };
+    auto loadMap3 = [this] { map.LoadMap3("Assets/Map/WholeMap3.png"); };
+    auto loadMap4 = [this] { map.LoadMap4("Assets/Map/WholeMap4.png"); };
+    auto GameOverLoad = [this] { gameOver.Load("Assets/GameOver.png", "Assets/Buttons/RestartButton.png", "Assets/Buttons/OnRestartButton.png"); };
+    auto UncleanDebuffLoadAssets = [this] { Unclean.Load("Assets/Debuffs/UncleanDebuff.png"); };
+    auto BathMinigameLoadAssets = [this] { bathMinigame.Load("Assets/Minigames/LightBlueBG.png", "Assets/Minigames/Sponge.png", "Assets/Minigames/OnSponge.png", "Assets/Bars/Bath/spritesheet.png"); };
+
+    // Store the lambda functions in an array for easy access
+    std::array<std::function<void()>, 6> loadMapFunctions = { loadMap2, loadMap3, loadMap4, GameOverLoad, UncleanDebuffLoadAssets, BathMinigameLoadAssets };
+
+    // Loop through the array and create the asynchronous threads
+    for (int i = 0; i < 6; i++)
+    {
+        // create a thread for each lambda function (in a thread pool)
+        futures.push_back(std::async(std::launch::async, loadMapFunctions[i]));
+    }
 }
 
 // Destructor
@@ -205,9 +187,18 @@ void Game::updateSFMLEvents()
 
             // If the mouse is moved, check if it is over the welcome button
         case sf::Event::MouseMoved:
+
+            // welcomeEnabled variable is used to lock and unlock the game
             if (welcomeEnabled)
             {
-                welcome.MouseOver(*window);
+                if (gameOver.getGameOverEnabled())
+                {
+					gameOver.restartButtonMouseOver(*window);
+				}
+                else
+                {
+                    welcome.MouseOver(*window);
+                }
             }
             else
             {
@@ -317,15 +308,37 @@ void Game::updateSFMLEvents()
 
             // If the mouse button is pressed, check if it is over the welcome button
         case sf::Event::MouseButtonPressed:
+
+            // welcomeEnabled variable is used to lock and unlock the game
             if (welcomeEnabled)
             {
-                if (welcome.ButtonState == 1)
+                // If the gameOver screen is shown, and the restart button is pressed, then restart the game
+                if (gameOver.getGameOverEnabled())
                 {
-                    currentArea = "Outside";
-                    welcomeEnabled = false; // Disables the welcome screen
-                    player.visible = true; // Makes the player visible
-                    player.setTexture(0, 0); // Sets the player's texture
-                    map.setPosition({ -1350, 0 }); // Sets the map's initial position
+                    if (gameOver.getRestartButtonState() == 1)
+                    {
+                        gameOver.setGameOverEnabled(false);
+                        welcomeEnabled = false;
+                        gameOver.setRestartButtonState(0);
+
+                        hungerBar.fillBar();
+                        energyBar.fillBar();
+                        boredomBar.fillBar();
+                        healthBar.fillHealthBar();
+                        currencyBar.updateValue(0);
+                    }
+                }
+                // if the welcome screen is shown, and the welcome button is pressed, then start the game
+                else
+                {
+                    if (welcome.ButtonState == 1)
+                    {
+                        currentArea = "Outside";
+                        welcomeEnabled = false; // Disables the welcome screen
+                        player.visible = true; // Makes the player visible
+                        player.setTexture(0, 0); // Sets the player's texture
+                        map.setPosition({ -1350, 0 }); // Sets the map's initial position
+                    }
                 }
             }
             else
@@ -879,6 +892,17 @@ void Game::update()
             eatingMinigame.MiniGameFinishedCheck(hungerBar, currency, currencyBar);
         }
     }
+
+    // If the health goes to 0, the game is over
+    if (healthBar.getValue() == 0)
+    {
+        welcomeEnabled = true;
+		gameOver.setGameOverEnabled(true);
+	}
+    else
+    {
+        gameOver.setGameOverEnabled(false);
+    }
 }
 
 // Renders the game
@@ -897,8 +921,15 @@ void Game::render()
     // If welcome screen is enabled (if the user is currently on the welcome screen), draw the welcome screen
     if (welcomeEnabled)
     {
-        this->window->draw(title.Sprite);
-        welcome.DrawTo(*window);
+        if (gameOver.getGameOverEnabled())
+        {
+            gameOver.Draw(*window);
+        }
+        else
+        {
+            this->window->draw(title.Sprite);
+            welcome.DrawTo(*window);
+        }
     }
     // Otherwise, draw the game
     else

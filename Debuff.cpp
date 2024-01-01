@@ -9,7 +9,7 @@ Debuff::~Debuff()
 {
 }
 
-void Debuff::Load(std::string dir, sf::Vector2f Scale)
+void Debuff::Load(std::string dir)
 {
 	// Load the texture and set the sprite
 	if (DebuffTexture.loadFromFile(dir))
@@ -21,14 +21,13 @@ void Debuff::Load(std::string dir, sf::Vector2f Scale)
 	{
 		std::cout << "Failed to load Debuff Texture" << std::endl;
 	}
-
-	Sprite.setScale(Scale);
 }
 
-void Debuff::Initialize(float newchange)
+void Debuff::Initialize(float newchange, sf::Vector2f Scale)
 {
 	// Set the change
 	change = newchange;
+	Sprite.setScale(Scale);
 }
 
 void Debuff::setPosition(sf::Vector2f position)

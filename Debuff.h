@@ -14,8 +14,8 @@ public:
 	Debuff();
 	~Debuff();
 
-	void Load(std::string dir, sf::Vector2f Size);
-	void Initialize(float newchange);
+	void Load(std::string dir);
+	void Initialize(float newchange, sf::Vector2f Scale);
 	void setPosition(sf::Vector2f position);
 	void setActive(bool active);
 	bool getActive();

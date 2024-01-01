@@ -24,6 +24,8 @@ public:
 	void updateValue(int newvalue);														// Updates the value of the bar
 	int getValue();																		// Returns the value of the bar
 	void resetValue();																	// Resets the value of the bar
+	void fillBar();																		// Fills the bar
+	void fillHealthBar();																	// Fills the health bar
 	void setCurrentX(int currentXNew);													// Sets the currentX of the bar
 	void setPosition(const sf::Vector2f Position, const sf::Vector2f PositionText);		// Sets the position of the bar
 	void setPosition(const sf::Vector2f Position);										// Sets the position of the bar

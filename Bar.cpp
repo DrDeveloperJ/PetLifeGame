@@ -94,6 +94,25 @@ void Bar::resetValue()
     empty = true;
 }
 
+void Bar::fillBar()
+{
+    // Fills the bar
+	value = 6;
+	full = true;
+	empty = false;
+	currentX = 0;
+	setTexture(currentX, 0, 200, 100);
+}
+
+void Bar::fillHealthBar()
+{
+    // Fills the health bar
+	value = 4;
+	empty = false;
+	currentX = 0;
+	setTexture(currentX, 0, 17, 17);
+}
+
 void Bar::setCurrentX(int currentXNew)
 {
     // Sets the current X position of the bar
