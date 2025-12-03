@@ -28,7 +28,9 @@ This project is made in SFML, so it is all sorted all ready for you to play as t
 
 To play simply :
 1. Clone this project
-2. Run the PetLife.exe
+2. Download https://www.sfml-dev.org/download/sfml/2.6.1/ (Only 32bit One and c++17) and extract it. Then put the folder SFML-2.6.1 into the PetLifeGame directory
+3. In Visual Studio (not vscode) choose x86-Release or x86-Debug and let it generate CMakeLists cache on it's own
+4. Run PetLife.exe from Visual Studio (or build and manually run generated exe)
 
 ---------------------------------------------------------------------------------
 

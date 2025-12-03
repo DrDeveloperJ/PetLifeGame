@@ -8,7 +8,7 @@ private:
 	sf::Texture darknessTexture;
 	sf::Sprite sleepingZ;
 	sf::Texture sleepingZTexture;
-	bool active;
+	bool active = false;
 	bool rewardAllowed = false;
 
 public:

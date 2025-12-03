@@ -16,10 +16,10 @@ private:
 	Button Map3Button;
 	Button Map4Button;
 
-	bool Map1Purchased;
-	bool Map2Purchased;
-	bool Map3Purchased;
-	bool Map4Purchased;
+	bool Map1Purchased = false;
+	bool Map2Purchased = false;
+	bool Map3Purchased = false;
+	bool Map4Purchased = false;
 
 	bool active;
 
