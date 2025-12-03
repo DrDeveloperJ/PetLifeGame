@@ -107,5 +107,5 @@ if(MSVC)
     )
     
     # Disable specific warnings if needed
-    target_compile_options(${PROJECT_NAME} PRIVATE /W3)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /sdl)
 endif()
